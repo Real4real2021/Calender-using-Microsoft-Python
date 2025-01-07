@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Product Insight</title>
+    <style>
+        :root {
+        --primary-color: #3498db;
+        --secondary-color: #2c3e50;
+        --accent-color: #e74c3c;
+        --background-color: #ecf0f1;
+        --text-color: #34495e;
+        --border-radius: 8px;
+    }
+
+    body {
+        font-family: 'Segoe UI', 'Roboto', sans-serif;
+        line-height: 1.6;
+        color: var(--text-color);
+        background-color: var(--background-color);
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        background-color: var(--secondary-color);
+        color: white;
+        text-align: center;
+        padding: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        margin: 0;
+        font-weight: 300;
+        letter-spacing: 1px;
+    }
+
+    main {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    section {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 2rem;
+        flex: 1;
+        min-width: 300px;
+    }
+
+    h2 {
+        color: var(--secondary-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        margin-top: 0;
+        font-weight: 400;
+    }
+
+    form {
+        display: grid;
+        gap: 1rem;
+    }
+
+    label {
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    input[type="text"]:hover,
+    input[type="number"]:hover,
+    input[type="file"]:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="file"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #2980b9;
+    }
+
+    .insight-div {
+        background-color: var(--background-color);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    footer {
+        text-align: center;
+        padding: 1rem 0;
+        background-color: var(--secondary-color);
+        color: white;
+        margin-top: 2rem;
+    }
+
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        margin-left: 0.5rem;
+        cursor: help;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: var(--secondary-color);
+        color: white;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        main {
+            flex-direction: column;
+        }
+    }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    
+        const calculateButton = document.getElementById('calculate-button');
+        const insightsResults = document.getElementById('insights-results');
+        const futherInsight = document.getElementById('further-insight');
+        const productForm = document.getElementById('product-form');
+        const spreadsheetUpload = document.getElementById('spreadsheet-upload');    
+        const AnalysisSummary = document.getElementById('Analysis Summary')
+        const keyFindings = document.getElementById('key_findings')
+        const CostProfitAnalysis = document.getElementById('Cost Profit Analysis')
+        const InterconnectednessOfMetrics = document.getElementById('Interconnectedness Of Metrics')
+        const breakEvenAnalysis = document.getElementById('break_even_analysis')
+
+
+        const message = [];
+
+        calculateButton.addEventListener('click', function() {
+            const file = spreadsheetUpload.files[0];
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+
+                    for (i = 0; i < workbook.SheetNames.length; i++) {
+                        const sheetName = workbook.SheetNames[i];
+                        const worksheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                        // processSpreadsheetData(jsonData);
+                        sendMessage(jsonData);
+                    }
+                };
+
+                reader.readAsBinaryString(file);
+            } else {
+                insightsResults.innerHTML = '<p>Please upload a spreadsheet file.</p>';
+            }
+        });
+
+
+        function sendMessage(message) { 
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message }) // Send the extracted text
+            })
+            .then(response => response.json())
+            .then(response => {
+               console.log(response);
+                let keyFindingsHtml = `
+                ${response.message.analysis_summary.key_findings.map(item => `<li>Key Findings: ${item}</li>`).join('')}
+                <li>Overall Health: ${response.message.analysis_summary.overall_health}</li>
+                `
+                let costBenefitAnalysisHtml = `
+                <li>Contribution Margin:${response.message.cost_profit_analysis.contribution_margin}</li>
+                <li>Profit Per Unit:${response.message.cost_profit_analysis.profit_per_unit}</li>
+                ${response.message.cost_profit_analysis.recommendations.map(item => `<li>Recommendation${item}</li>`).join('')}
+                <li>Total Cost Per Unit:${response.message.cost_profit_analysis.total_cost_per_unit}</li>
+                <li>Variable Cost Per Unit${response.message.cost_profit_analysis.variable_cost_per_unit}</li>
+                `
+               let interconnectednessOfMetricsHTML = `
+               <li>Notes: ${response.message.interconnectedness.notes}</li>
+               `
+
+               let revenueBreakEvenAnalysisHTML = `
+               <li>Break Even Point Units: ${response.message.revenue_break_even_analysis.break_even_point_units}</li>
+               <li>Fixed Costs: ${response.message.revenue_break_even_analysis.fixed_costs}</li>
+               <li>Profit Margin:${response.message.revenue_break_even_analysis.profit_margin}</li>
+               ${response.message.revenue_break_even_analysis.recommendations.map(item => `<li>Recommendations:${item}</li>`).join('')}
+               <li>Total Profits: ${response.message.revenue_break_even_analysis.total_profit}</li>
+               <li>Total Revenue${response.message.revenue_break_even_analysis.total_revenue}</li>
+               `
+                
+                keyFindings.innerHTML += keyFindingsHtml
+                InterconnectednessOfMetrics.innerHTML += interconnectednessOfMetricsHTML
+                breakEvenAnalysis.innerHTML += revenueBreakEvenAnalysisHTML
+                CostProfitAnalysis.innerHTML += costBenefitAnalysisHtml
+
+                if (response.js_code) {
+                    eval(response.js_code);
+                }
+            });
+        }
+    });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Business Product Insights</h1>
+    </header>
+
+    <main>
+        <section id="input-section">
+            <h2>Input Product Data</h2>
+            <form id="product-form">
+                <label for="spreadsheet-upload">
+                    Upload Spreadsheet:
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Upload an Excel spreadsheet containing your product data</span>
+                    </div>
+                </label>
+                <input type="file" id="spreadsheet-upload" name="spreadsheet-upload" accept=".xlsx,.xls">
+
+                <label for="product-name">
+                    Product Name:
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Enter the name of your product</span>
+                    </div>
+                </label>
+                <input type="text" id="product-name" name="product-name" required>
+
+                <label for="raw-material-cost">
+                    Raw Material Cost (R):
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Enter the cost of raw materials per unit</span>
+                    </div>
+                </label>
+                <input type="number" id="raw-material-cost" name="raw-material-cost" step="0.01" required>
+
+                <label for="labor-cost">
+                    Labor Cost (R):
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Enter the labor cost per unit</span>
+                    </div>
+                </label>
+                <input type="number" id="labor-cost" name="labor-cost" step="0.01" required>
+
+                <label for="other-costs">
+                    Other Costs (R):
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Enter any additional costs per unit (optional)</span>
+                    </div>
+                </label>
+                <input type="number" id="other-costs" name="other-costs" step="0.01">
+
+                <label for="selling-price">
+                    Selling Price (R):
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Enter the selling price per unit</span>
+                    </div>
+                </label>
+                <input type="number" id="selling-price" name="selling-price" step="0.01" required>
+
+                <label for="units-sold">
+                    Units Sold (Estimated or Actual):
+                    <div class="tooltip">?
+                        <span class="tooltiptext">Enter the number of units sold or estimated to be sold</span>
+                    </div>
+                </label>
+                <input type="number" id="units-sold" name="units-sold" required>
+
+                <button type="button" id="calculate-button">Generate Insights</button>
+            </form>
+        </section>
+
+        <section id="insights-section">
+            <h2>Insights</h2>
+            <div class="insight-div" id="insights-results">
+                <p>Your insights will appear here after you generate them.</p>
+                <div id="Analysis Summary">
+                    <h4>Analysis Summary</h4>
+                    <div id="key_findings">
+
+                    </div>
+                </div> 
+                <div id="Cost Profit Analysis">
+                    <h4>Cost Profit Analysis</h4>
+                    <div id="cost_profit_analysis">
+
+                    </div>
+                </div> 
+                <div id="Interconnectedness Of Metrics">
+                    <h4>Interconnectedness Of Metrics</h4>
+                    <div id="interconnectedness_of_metrics">
+
+                    </div>
+                </div> 
+                <div id="Break-Even Analysis">
+                    <h4>Break-Even Analysis</h4>
+                    <div id="break_even_analysis">
+
+                    </div>
+                </div> 
+            </div>
+        </section>
+        
+        <section id="insights-section">
+            <h2>Further Insights</h2>
+            <div class="insight-div" id="further-insight">
+                <p>Your insights will appear here after you generate them.</p>
+                <div id="Analysis Summary">
+                    <h4>Analysis Summary</h4>
+                    <div id="key_findings">
+
+                    </div>
+                </div> 
+                <div id="Cost Profit Analysis">
+                    <h4>Cost Profit Analysis</h4>
+                    <div id="cost_profit_analysis">
+
+                    </div>
+                </div> 
+                <div id="Interconnectedness Of Metrics">
+                    <h4>Interconnectedness Of Metrics</h4>
+                    <div id="interconnectedness_of_metrics">
+
+                    </div>
+                </div> 
+                <div id="Break-Even Analysis">
+                    <h4>Break-Even Analysis</h4>
+                    <div id="break_even_analysis">
+
+                    </div>
+                </div> 
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Business Insights</p>
+    </footer>
+</body>
+</html>
