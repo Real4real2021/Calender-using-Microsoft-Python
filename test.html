@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Business Product Insight</title>
     <style>
-        :root {
-        --primary-color: #3498db;
-        --secondary-color: #2c3e50;
-        --accent-color: #e74c3c;
-        --background-color: #ecf0f1;
-        --text-color: #34495e;
-        --border-radius: 8px;
+    :root {
+    --primary-color: #3498db;
+    --secondary-color: #2c3e50;
+    --accent-color: #e74c3c;
+    --background-color: #ecf0f1;
+    --text-color: #34495e;
+    --border-radius: 8px;
     }
 
     body {
@@ -37,12 +37,34 @@
         letter-spacing: 1px;
     }
 
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    nav ul li {
+        margin: 0 1rem;
+    }
+
+    nav ul li a {
+        color: white;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    nav ul li a:hover {
+        color: var(--primary-color);
+    }
+
     main {
         max-width: 1200px;
         margin: 2rem auto;
         padding: 0 1rem;
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 2rem;
     }
 
@@ -51,8 +73,6 @@
         border-radius: var(--border-radius);
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         padding: 2rem;
-        flex: 1;
-        min-width: 300px;
     }
 
     h2 {
@@ -120,6 +140,8 @@
         border-radius: var(--border-radius);
         padding: 1rem;
         margin-top: 1rem;
+        max-height: 400px;
+        overflow-y: auto;
     }
 
     footer {
@@ -161,12 +183,12 @@
 
     @media (max-width: 768px) {
         main {
-            flex-direction: column;
+            grid-template-columns: 1fr;
         }
     }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
+
+    </style>
 </head>
 <body>
     <header>
@@ -238,12 +260,16 @@
         </section>
 
         <section id="insights-section">
-            <h2>Insights</h2>
+            <h2>Report</h2>
             <div class="insight-div" id="insights-results">
-                <p>Your insights will appear here after you generate them.</p>
+                <p>Your report will appear here after it is generated.</p>
             </div>
+        </section>
+        
+        <section id="insights-section">
+            <h2>Analysis</h2>
             <div class="insight-div" id="further-insight">
-
+                <p>Your analysis will appear here after it is generated.</p>
             </div>
         </section>
     </main>
@@ -251,7 +277,5 @@
     <footer>
         <p>&copy; 2023 Business Insights</p>
     </footer>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>
