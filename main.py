@@ -3,7 +3,6 @@ import os
 import json
 import openai 
 from openai import OpenAI
-from dotenv import load_dotenv
 import re 
 
 app = Flask(__name__)
@@ -18,9 +17,9 @@ Question: {question}
 
 Answer:
 """
-# load_dotenv()
+
 client = OpenAI()
-# openai.api_key = os.environ.get('OPENAI_API_KEY')
+openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 @app.route('/')
 def index():
