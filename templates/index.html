@@ -135,6 +135,20 @@
         background-color: #2980b9;
     }
 
+    .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+    grid-gap: 20px; /* Space between grid items */
+    padding: 20px;
+    }
+
+    .grid-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
     .insight-div {
         background-color: var(--background-color);
         border-radius: var(--border-radius);
@@ -150,6 +164,50 @@
         background-color: var(--secondary-color);
         color: white;
         margin-top: 2rem;
+    }
+
+    /* Basic Styling */
+    .analysis-section {
+        margin-bottom: 20px; /* Add space between sections */
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .insights-list {
+        list-style: none;  /* Remove bullet points */
+        padding: 0;
+    }
+
+    .insights-list li {
+        margin-bottom: 8px; /* Add space between list items */
+    }
+
+    .recommendation-section {
+        margin-bottom: 20px;
+    }
+
+    .recommendation {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+
+    .recommendation h5 {
+        margin-top: 0; /* Reset default heading margin */
+        font-size: 1.1em;
+        color: #333;
+    }
+
+    .recommendation p {
+        margin-bottom: 5px;
+    }
+
+    h4 {
+        color: #007bff; /* Example: Use a primary color for headings */
+        margin-bottom: 10px;
     }
 
     .tooltip {
@@ -190,7 +248,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', function() {
     
         const calculateButton = document.getElementById('calculate-button');
@@ -203,11 +261,13 @@
         const CostProfitAnalysis = document.getElementById('Cost Profit Analysis')
         const InterconnectednessOfMetrics = document.getElementById('Interconnectedness Of Metrics')
         const breakEvenAnalysis = document.getElementById('break_even_analysis')
+        const gridContainer = document.querySelector('.grid-container')
 
 
         const message = [];
 
         calculateButton.addEventListener('click', function() {
+            console.log("clicked")
             const file = spreadsheetUpload.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -215,11 +275,11 @@
                 reader.onload = function(e) {
                     const data = e.target.result;
                     const workbook = XLSX.read(data, { type: 'binary' });
-
-                    for (i = 0; i < workbook.SheetNames.length; i++) {
+                    for (let i = 0; i < workbook.SheetNames.length; i++) {
                         const sheetName = workbook.SheetNames[i];
                         const worksheet = workbook.Sheets[sheetName];
                         const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                        
                         // processSpreadsheetData(jsonData);
                         sendMessage(jsonData);
                     }
@@ -234,8 +294,7 @@
 
         function sendMessage(message) { 
 
-            insightsResults.innerHTML = '<p>Generating insights...</p>';
-            futherInsight.innerHTML = '<p>Analyzing data...</p>';
+            gridContainer.innerHTML = `Generating Insights...`
 
             fetch('/chat', {
                 method: 'POST',
@@ -246,52 +305,81 @@
             })
             .then(response => response.json())
             .then(response => {
-               console.log(response);
-                let insightsHTML = `
-                    <h4>Cost Profit Analysis</h4>
-                    <li>${response.message.cost_profit_analysis.contribution_margin}% Contribution Margin</li>
-                    <li>R ${response.message.cost_profit_analysis.profit_per_unit} Profit per Unit</li>
-                    <li>R ${response.message.cost_profit_analysis.total_cost_per_unit} Total Cost per Unit</li>
-                    <li>R ${response.message.cost_profit_analysis.variable_cost_per_unit} Variable Cost per Unit</li>
+               console.log(response)
+                let gridContent = `
+                        <div class="grid-item">
+                            <h4>Cost Profit Analysis</h4>
+                            <div class="analysis-section">
+                                <ul class="insights-list">
+                                    <li><strong>Contribution Margin:</strong> ${response.message.cost_profit_analysis.contribution_margin}%</li>
+                                    <li><strong>Profit per Unit:</strong> R ${response.message.cost_profit_analysis.profit_per_unit}</li>
+                                    <li><strong>Total Cost per Unit:</strong> R ${response.message.cost_profit_analysis.total_cost_per_unit}</li>
+                                    <li><strong>Variable Cost per Unit:</strong> R ${response.message.cost_profit_analysis.variable_cost_per_unit}</li>
+                                </ul>
+                            </div>
+                        </div>
 
-                    <h4>Revenue Break Even Analysis</h4>
-                    <li>${response.message.revenue_break_even_analysis.break_even_point_units} Break Even Point Units</li>
-                    <li>R ${response.message.revenue_break_even_analysis.fixed_costs} Fixed Costs</li>
-                    <li>R ${response.message.revenue_break_even_analysis.total_profit} Total Profit</li>
-                    <li>R ${response.message.revenue_break_even_analysis.total_revenue} Total Revenue</li>
-                    <li>R ${response.message.revenue_break_even_analysis.profit_margin}% Profit Margin</li>
-                    `;
+                        <div class="grid-item">
+                            <h4>Revenue Break Even Analysis</h4>
+                            <div class="analysis-section">
+                                <ul class="insights-list">
+                                    <li><strong>Break Even Point (Units):</strong> ${response.message.revenue_break_even_analysis.break_even_point_units}</li>
+                                    <li><strong>Fixed Costs:</strong> R ${response.message.revenue_break_even_analysis.fixed_costs}</li>
+                                    <li><strong>Total Profit:</strong> R ${response.message.revenue_break_even_analysis.total_profit}</li>
+                                    <li><strong>Total Revenue:</strong> R ${response.message.revenue_break_even_analysis.total_revenue}</li>
+                                    <li><strong>Profit Margin:</strong> ${response.message.revenue_break_even_analysis.profit_margin}%</li>
+                                </ul>
+                            </div>
+                        </div>
 
-                    let furtherInsightHTML = `
-                    <h4>Analysis Summary</h4>
-                    <li>${response.message.analysis_summary.overall_health} Overall Health</li>
-                    <li>${response.message.analysis_summary.key_findings}</li>
+                        <div class="grid-item">
+                            <h4>Analysis Summary</h4>
+                            <div class="analysis-section">
+                                <p><strong>Overall Health:</strong> ${response.message.analysis_summary.overall_health}</p>
+                                <p><strong>Key Findings:</strong> ${response.message.analysis_summary.key_findings}</p>
+                            </div>
+                        </div>
 
-                    <h4>Interconnectedness</h4>
-                    <li>${response.message.interconnectedness.notes}</li>
+                        <div class="grid-item">
+                            <h4>Interconnectedness</h4>
+                            <div class="analysis-section">
+                                <p>${response.message.interconnectedness.notes}</p>
+                            </div>
+                        </div>
 
-                    <h4>Cost Profit Analysis Recommendations</h4>
-                    ${response.message.cost_profit_analysis.recommendations.map(recommendation => `
-                        <h5>Advice</h5>
-                        <li>${recommendation.advice}</li>
-                        <h5>Area</h5>
-                        <li>${recommendation.area}</li>
-                        <h5>Impact</h5>
-                        <li>${recommendation.impact}</li>
-                    `).join('')}
+                        <div class="grid-item">
+                            <h4>Cost Profit Analysis Recommendations</h4>
+                            <div class="recommendation-section">
+                                ${response.message.cost_profit_analysis.recommendations.map(recommendation => `
+                                    <div class="recommendation">
+                                        <h5>Advice</h5>
+                                        <p>${recommendation.advice}</p>
+                                        <h5>Area</h5>
+                                        <p>${recommendation.area}</p>
+                                        <h5>Impact</h5>
+                                        <p>${recommendation.impact}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
 
-                    <h4>Break Even Analysis Recommendations</h4>
-                    ${response.message.revenue_break_even_analysis.recommendations.map(recommendation => `
-                        <h5>Advice</h5>
-                        <li>${recommendation.advice}</li>
-                        <h5>Area</h5>
-                        <li>${recommendation.area}</li>
-                        <h5>Impact</h5>
-                        <li>${recommendation.impact}</li>
-                    `).join('')}
+                        <div class="grid-item">
+                            <h4>Break Even Analysis Recommendations</h4>
+                            <div class="recommendation-section">
+                                ${response.message.revenue_break_even_analysis.recommendations.map(recommendation => `
+                                    <div class="recommendation">
+                                        <h5>Advice</h5>
+                                        <p>${recommendation.advice}</p>
+                                        <h5>Area</h5>
+                                        <p>${recommendation.area}</p>
+                                        <h5>Impact</h5>
+                                        <p>${recommendation.impact}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
                     `
-                    insightsResults.innerHTML = insightsHTML;
-                    futherInsight.innerHTML = furtherInsightHTML;
+                    gridContainer.innerHTML = gridContent;
 
                 if (response.js_code) {
                     eval(response.js_code);
@@ -307,6 +395,8 @@
     </header>
 
     <main>
+        <div class="grid-container">
+
         <section id="input-section">
             <h2>Input Product Data</h2>
             <form id="product-form">
@@ -317,72 +407,13 @@
                     </div>
                 </label>
                 <input type="file" id="spreadsheet-upload" name="spreadsheet-upload" accept=".xlsx,.xls">
-
-                <!-- <label for="product-name">
-                    Product Name:
-                    <div class="tooltip">?
-                        <span class="tooltiptext">Enter the name of your product</span>
-                    </div>
-                </label>
-                <input type="text" id="product-name" name="product-name" required>
-
-                <label for="raw-material-cost">
-                    Raw Material Cost (R):
-                    <div class="tooltip">?
-                        <span class="tooltiptext">Enter the cost of raw materials per unit</span>
-                    </div>
-                </label>
-                <input type="number" id="raw-material-cost" name="raw-material-cost" step="0.01" required>
-
-                <label for="labor-cost">
-                    Labor Cost (R):
-                    <div class="tooltip">?
-                        <span class="tooltiptext">Enter the labor cost per unit</span>
-                    </div>
-                </label>
-                <input type="number" id="labor-cost" name="labor-cost" step="0.01" required>
-
-                <label for="other-costs">
-                    Other Costs (R):
-                    <div class="tooltip">?
-                        <span class="tooltiptext">Enter any additional costs per unit (optional)</span>
-                    </div>
-                </label>
-                <input type="number" id="other-costs" name="other-costs" step="0.01">
-
-                <label for="selling-price">
-                    Selling Price (R):
-                    <div class="tooltip">?
-                        <span class="tooltiptext">Enter the selling price per unit</span>
-                    </div>
-                </label>
-                <input type="number" id="selling-price" name="selling-price" step="0.01" required>
-
-                <label for="units-sold">
-                    Units Sold (Estimated or Actual):
-                    <div class="tooltip">?
-                        <span class="tooltiptext">Enter the number of units sold or estimated to be sold</span>
-                    </div>
-                </label>
-                <input type="number" id="units-sold" name="units-sold" required> -->
-
                 <button type="button" id="calculate-button">Generate Insights</button>
+                <a href="/dashboard">Dashboard</a>
             </form>
         </section>
 
-        <section id="insights-section">
-            <h2>Report</h2>
-            <div class="insight-div" id="insights-results">
-                <p>Your report will appear here after it is generated.</p>
-            </div>
-        </section>
-        
-        <section id="insights-section">
-            <h2>Analysis</h2>
-            <div class="insight-div" id="further-insight">
-                <p>Your analysis will appear here after it is generated.</p>
-            </div>
-        </section>
+
+        </div>
     </main>
 
     <footer>
