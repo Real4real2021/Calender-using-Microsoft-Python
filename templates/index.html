@@ -4,420 +4,290 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Business Product Insight</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-    --primary-color: #3498db;
-    --secondary-color: #2c3e50;
-    --accent-color: #e74c3c;
-    --background-color: #ecf0f1;
-    --text-color: #34495e;
-    --border-radius: 8px;
-    }
-
-    body {
-        font-family: 'Segoe UI', 'Roboto', sans-serif;
-        line-height: 1.6;
-        color: var(--text-color);
-        background-color: var(--background-color);
-        margin: 0;
-        padding: 0;
-    }
-
-    header {
-        background-color: var(--secondary-color);
-        color: white;
-        text-align: center;
-        padding: 1.5rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-        margin: 0;
-        font-weight: 300;
-        letter-spacing: 1px;
-    }
-
-    nav ul {
-        list-style-type: none;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        margin-top: 1rem;
-    }
-
-    nav ul li {
-        margin: 0 1rem;
-    }
-
-    nav ul li a {
-        color: white;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    nav ul li a:hover {
-        color: var(--primary-color);
-    }
-
-    main {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 0 1rem;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-    }
-
-    section {
-        background-color: white;
-        border-radius: var(--border-radius);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 2rem;
-    }
-
-    h2 {
-        color: var(--secondary-color);
-        border-bottom: 2px solid var(--primary-color);
-        padding-bottom: 0.5rem;
-        margin-top: 0;
-        font-weight: 400;
-    }
-
-    form {
-        display: grid;
-        gap: 1rem;
-    }
-
-    label {
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="file"] {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ddd;
-        border-radius: var(--border-radius);
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    input[type="text"]:hover,
-    input[type="number"]:hover,
-    input[type="file"]:hover {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    input[type="file"]:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-    }
-
-    button {
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        padding: 0.75rem 1rem;
-        border-radius: var(--border-radius);
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-        background-color: #2980b9;
-    }
-
-    .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
-    grid-gap: 20px; /* Space between grid items */
-    padding: 20px;
-    }
-
-    .grid-item {
-        border: 1px solid #ddd;
-        padding: 15px;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-
-    .insight-div {
-        background-color: var(--background-color);
-        border-radius: var(--border-radius);
-        padding: 1rem;
-        margin-top: 1rem;
-        max-height: 400px;
-        overflow-y: auto;
-    }
-
-    footer {
-        text-align: center;
-        padding: 1rem 0;
-        background-color: var(--secondary-color);
-        color: white;
-        margin-top: 2rem;
-    }
-
-    /* Basic Styling */
-    .analysis-section {
-        margin-bottom: 20px; /* Add space between sections */
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
-
-    .insights-list {
-        list-style: none;  /* Remove bullet points */
-        padding: 0;
-    }
-
-    .insights-list li {
-        margin-bottom: 8px; /* Add space between list items */
-    }
-
-    .recommendation-section {
-        margin-bottom: 20px;
-    }
-
-    .recommendation {
-        border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 5px;
-    }
-
-    .recommendation h5 {
-        margin-top: 0; /* Reset default heading margin */
-        font-size: 1.1em;
-        color: #333;
-    }
-
-    .recommendation p {
-        margin-bottom: 5px;
-    }
-
-    h4 {
-        color: #007bff; /* Example: Use a primary color for headings */
-        margin-bottom: 10px;
-    }
-
-    .tooltip {
-        position: relative;
-        display: inline-block;
-        margin-left: 0.5rem;
-        cursor: help;
-    }
-
-    .tooltip .tooltiptext {
-        visibility: hidden;
-        width: 200px;
-        background-color: var(--secondary-color);
-        color: white;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px;
-        position: absolute;
-        z-index: 1;
-        bottom: 125%;
-        left: 50%;
-        margin-left: -100px;
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    .tooltip:hover .tooltiptext {
-        visibility: visible;
-        opacity: 1;
-    }
-
-    @media (max-width: 768px) {
-        main {
-            grid-template-columns: 1fr;
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --background-color: #f3f4f6;
         }
-    }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-    <script type="module">
-        document.addEventListener('DOMContentLoaded', function() {
-    
-        const calculateButton = document.getElementById('calculate-button');
-        const insightsResults = document.getElementById('insights-results');
-        const futherInsight = document.getElementById('further-insight');
-        const productForm = document.getElementById('product-form');
-        const spreadsheetUpload = document.getElementById('spreadsheet-upload');    
-        const AnalysisSummary = document.getElementById('Analysis Summary')
-        const keyFindings = document.getElementById('key_findings')
-        const CostProfitAnalysis = document.getElementById('Cost Profit Analysis')
-        const InterconnectednessOfMetrics = document.getElementById('Interconnectedness Of Metrics')
-        const breakEvenAnalysis = document.getElementById('break_even_analysis')
-        const gridContainer = document.querySelector('.grid-container')
-
-
-        const message = [];
-
-        calculateButton.addEventListener('click', function() {
-            console.log("clicked")
-            const file = spreadsheetUpload.files[0];
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: 'binary' });
-                    for (let i = 0; i < workbook.SheetNames.length; i++) {
-                        const sheetName = workbook.SheetNames[i];
-                        const worksheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                        
-                        // processSpreadsheetData(jsonData);
-                        sendMessage(jsonData);
-                    }
-                };
-
-                reader.readAsBinaryString(file);
-            } else {
-                insightsResults.innerHTML = '<p>Please upload a spreadsheet file.</p>';
-            }
-        });
-
-
-        function sendMessage(message) { 
-
-            gridContainer.innerHTML = `Generating Insights...`
-
-            fetch('/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ message: message }) // Send the extracted text
-            })
-            .then(response => response.json())
-            .then(response => {
-               console.log(response)
-                let gridContent = `
-                        <div class="grid-item">
-                            <h4>Cost Profit Analysis</h4>
-                            <div class="analysis-section">
-                                <ul class="insights-list">
-                                    <li><strong>Contribution Margin:</strong> ${response.message.cost_profit_analysis.contribution_margin}%</li>
-                                    <li><strong>Profit per Unit:</strong> R ${response.message.cost_profit_analysis.profit_per_unit}</li>
-                                    <li><strong>Total Cost per Unit:</strong> R ${response.message.cost_profit_analysis.total_cost_per_unit}</li>
-                                    <li><strong>Variable Cost per Unit:</strong> R ${response.message.cost_profit_analysis.variable_cost_per_unit}</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="grid-item">
-                            <h4>Revenue Break Even Analysis</h4>
-                            <div class="analysis-section">
-                                <ul class="insights-list">
-                                    <li><strong>Break Even Point (Units):</strong> ${response.message.revenue_break_even_analysis.break_even_point_units}</li>
-                                    <li><strong>Fixed Costs:</strong> R ${response.message.revenue_break_even_analysis.fixed_costs}</li>
-                                    <li><strong>Total Profit:</strong> R ${response.message.revenue_break_even_analysis.total_profit}</li>
-                                    <li><strong>Total Revenue:</strong> R ${response.message.revenue_break_even_analysis.total_revenue}</li>
-                                    <li><strong>Profit Margin:</strong> ${response.message.revenue_break_even_analysis.profit_margin}%</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="grid-item">
-                            <h4>Analysis Summary</h4>
-                            <div class="analysis-section">
-                                <p><strong>Overall Health:</strong> ${response.message.analysis_summary.overall_health}</p>
-                                <p><strong>Key Findings:</strong> ${response.message.analysis_summary.key_findings}</p>
-                            </div>
-                        </div>
-
-                        <div class="grid-item">
-                            <h4>Interconnectedness</h4>
-                            <div class="analysis-section">
-                                <p>${response.message.interconnectedness.notes}</p>
-                            </div>
-                        </div>
-
-                        <div class="grid-item">
-                            <h4>Cost Profit Analysis Recommendations</h4>
-                            <div class="recommendation-section">
-                                ${response.message.cost_profit_analysis.recommendations.map(recommendation => `
-                                    <div class="recommendation">
-                                        <h5>Advice</h5>
-                                        <p>${recommendation.advice}</p>
-                                        <h5>Area</h5>
-                                        <p>${recommendation.area}</p>
-                                        <h5>Impact</h5>
-                                        <p>${recommendation.impact}</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-
-                        <div class="grid-item">
-                            <h4>Break Even Analysis Recommendations</h4>
-                            <div class="recommendation-section">
-                                ${response.message.revenue_break_even_analysis.recommendations.map(recommendation => `
-                                    <div class="recommendation">
-                                        <h5>Advice</h5>
-                                        <p>${recommendation.advice}</p>
-                                        <h5>Area</h5>
-                                        <p>${recommendation.area}</p>
-                                        <h5>Impact</h5>
-                                        <p>${recommendation.impact}</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `
-                    gridContainer.innerHTML = gridContent;
-
-                if (response.js_code) {
-                    eval(response.js_code);
-                }
-            });
-        }
-    });
-    </script>
 </head>
 <body>
-    <header>
-        <h1>Business Product Insights</h1>
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <h1 class="text-2xl font-bold text-gray-800">Business Product Insights</h1>
+        </div>
     </header>
 
-    <main>
-        <div class="grid-container">
-
-        <section id="input-section">
-            <h2>Input Product Data</h2>
-            <form id="product-form">
-                <label for="spreadsheet-upload">
-                    Upload Spreadsheet:
-                    <div class="tooltip">?
-                        <span class="tooltiptext">Upload an Excel spreadsheet containing your product data</span>
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <section class="mb-8">
+            <div class="bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">Data Input</h2>
+                <form id="product-form" class="space-y-6">
+                    <div class="relative">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Upload Spreadsheet
+                            <span class="ml-1 text-xs text-gray-500">(Excel files only)</span>
+                        </label>
+                        <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 transition-all duration-300 hover:border-blue-500">
+                            <input type="file" id="spreadsheet-upload" accept=".xlsx,.xls" 
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            <div class="text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <p class="mt-1 text-sm text-gray-600">Drag and drop or click to select</p>
+                            </div>
+                        </div>
                     </div>
-                </label>
-                <input type="file" id="spreadsheet-upload" name="spreadsheet-upload" accept=".xlsx,.xls">
-                <button type="button" id="calculate-button">Generate Insights</button>
-                <a href="/dashboard">Dashboard</a>
-            </form>
+                    <button type="button" id="calculate-button" 
+                            class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-blue-700 transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                        Generate Insights
+                        <span id="loading-spinner" class="hidden ml-2 inline-block animate-spin">⚬</span>
+                    </button>
+                </form>
+            </div>
         </section>
 
+        <div id="results-container" class="hidden">
+            <div class="tabs-container mb-4">
+                <div id="sheet-tabs" class="flex space-x-2 mb-4">
+                    <!-- Tabs will be dynamically added here -->
+                </div>
+            </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="metric-card">
+                    <h3 class="text-lg font-semibold mb-2">Profit Margin</h3>
+                    <p class="text-2xl" id="profit-margin">-</p>
+                </div>
+                <div class="metric-card">
+                    <h3 class="text-lg font-semibold mb-2">Break Even Point</h3>
+                    <p class="text-2xl" id="break-even">-</p>
+                </div>
+                <div class="metric-card">
+                    <h3 class="text-lg font-semibold mb-2">Revenue</h3>
+                    <p class="text-2xl" id="total-revenue">-</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="dashboard-card">
+                    <h3 class="text-lg font-semibold mb-4">Cost Structure</h3>
+                    <canvas id="costChart"></canvas>
+                </div>
+                <div class="dashboard-card">
+                    <h3 class="text-lg font-semibold mb-4">Revenue vs Costs</h3>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="dashboard-card mt-6">
+                <h3 class="text-lg font-semibold mb-4">Recommendations</h3>
+                <div id="recommendations" class="space-y-4">
+                    <!-- Recommendations will be added here -->
+                </div>
+            </div>
         </div>
     </main>
 
-    <footer>
-        <p>&copy; 2025 Business Insights</p>
-    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateButton = document.getElementById('calculate-button');
+            const resultsContainer = document.getElementById('results-container');
+            const sheetTabs = document.getElementById('sheet-tabs');
+            let currentData = null;
+            let charts = {};
+
+            calculateButton.addEventListener('click', async function() {
+                const file = document.getElementById('spreadsheet-upload').files[0];
+                const spinner = document.getElementById('loading-spinner');
+                if (!file) {
+                    alert('Please select a file');
+                    return;
+                }
+                
+                spinner.classList.remove('hidden');
+                calculateButton.disabled = true;
+                calculateButton.classList.add('opacity-75');
+
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+
+                    // Clear existing tabs
+                    sheetTabs.innerHTML = '';
+
+                    // Create tabs for each sheet
+                    workbook.SheetNames.forEach((sheetName, index) => {
+                        const tab = document.createElement('button');
+                        tab.className = `tab-button ${index === 0 ? 'active' : ''}`;
+                        tab.textContent = sheetName;
+                        tab.onclick = () => switchTab(sheetName);
+                        sheetTabs.appendChild(tab);
+                    });
+
+                    // Process first sheet
+                    const firstSheet = workbook.SheetNames[0];
+                    processSheet(workbook.Sheets[firstSheet]);
+                };
+                reader.readAsBinaryString(file);
+            });
+
+            function switchTab(sheetName) {
+                // Update active tab
+                document.querySelectorAll('.tab-button').forEach(tab => {
+                    tab.classList.toggle('active', tab.textContent === sheetName);
+                });
+
+                // Update charts and metrics for the selected sheet
+                updateDashboard(currentData[sheetName]);
+            }
+
+            function updateDashboard(data) {
+                // Update metrics
+                document.getElementById('profit-margin').textContent = `${data.revenue_break_even_analysis.profit_margin}%`;
+                document.getElementById('break-even').textContent = data.revenue_break_even_analysis.break_even_point_units;
+                document.getElementById('total-revenue').textContent = `$${data.revenue_break_even_analysis.total_revenue}`;
+
+                // Update charts
+                updateCostChart(data);
+                updateRevenueChart(data);
+                updateRecommendations(data);
+            }
+
+            function updateCostChart(data) {
+                const ctx = document.getElementById('costChart').getContext('2d');
+                if (charts.costChart) charts.costChart.destroy();
+
+                charts.costChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Fixed Costs', 'Variable Costs'],
+                        datasets: [{
+                            data: [
+                                data.revenue_break_even_analysis.fixed_costs,
+                                data.cost_profit_analysis.variable_cost_per_unit
+                            ],
+                            backgroundColor: ['#3b82f6', '#60a5fa']
+                        }]
+                    }
+                });
+            }
+
+            function updateRevenueChart(data) {
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                if (charts.revenueChart) charts.revenueChart.destroy();
+
+                charts.revenueChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Revenue', 'Costs', 'Profit'],
+                        datasets: [{
+                            data: [
+                                data.revenue_break_even_analysis.total_revenue,
+                                data.cost_profit_analysis.total_cost_per_unit,
+                                data.revenue_break_even_analysis.total_profit
+                            ],
+                            backgroundColor: ['#3b82f6', '#ef4444', '#10b981']
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateRecommendations(data) {
+                const recommendationsContainer = document.getElementById('recommendations');
+                recommendationsContainer.innerHTML = '';
+
+                data.cost_profit_analysis.recommendations.forEach(rec => {
+                    const recDiv = document.createElement('div');
+                    recDiv.className = 'p-4 bg-blue-50 rounded-lg';
+                    recDiv.innerHTML = `
+                        <h4 class="font-semibold text-blue-800">${rec.area}</h4>
+                        <p class="text-gray-700">${rec.advice}</p>
+                        <p class="text-sm text-blue-600 mt-2">Impact: ${rec.impact}</p>
+                    `;
+                    recommendationsContainer.appendChild(recDiv);
+                });
+            }
+
+            async function processSheet(sheetData) {
+                const jsonData = XLSX.utils.sheet_to_json(sheetData);
+
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message: jsonData })
+                    });
+
+                    const result = await response.json();
+                    currentData = result.message;
+                    resultsContainer.classList.remove('hidden');
+                    updateDashboard(result.message);
+                    spinner.classList.add('hidden');
+                    calculateButton.disabled = false;
+                    calculateButton.classList.remove('opacity-75');
+                    
+                    // Remove the input section
+                    document.querySelector('section.mb-8').remove();
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing the data');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
