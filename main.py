@@ -252,40 +252,14 @@ def chat():
           generated_text = generated_text.replace('```json','').strip()
           generated_text = re.sub(r"^\s*|\s*$", "", generated_text) 
           generated_text = re.sub(r"[^\x20-\x7E]+", "", generated_text)
-
-          try:
-                # Use ijson for parsing
-                extraction_result = {}
-                parser = ijson.parse(generated_text.encode('utf-8'))  # Encode to bytes
-                
-                current_key = None
-                current_obj = extraction_result
-                obj_stack = []
-
-                for prefix, event, value in parser:
-                    if event == 'map_key':
-                        current_key = value
-                    elif event in ('string', 'number', 'boolean', 'null'):
-                        current_obj[current_key] = value
-                    elif event == 'start_map':
-                        obj_stack.append(current_obj)
-                        current_obj[current_key] = {}
-                        current_obj = current_obj[current_key]
-                    elif event == 'end_map':
-                        current_obj = obj_stack.pop()
-                    elif event == 'start_array':
-                        obj_stack.append(current_obj)
-                        current_obj[current_key] = []
-                        current_obj = current_obj[current_key]
-                    elif event == 'end_array':
-                        current_obj = obj_stack.pop()
-
-                print(repr(extraction_result))
-            except ijson.JSONError as e:
-                return jsonify({"error": f"Invalid JSON returned from OpenAI: {e}, Raw response: {generated_text}"})
-
         else:
-            raise ValueError("Unexpected response format from OpenAI API.")
+          raise ValueError("Unexpected response format from OpenAI API.")
+
+        try:
+            print(repr(response.choices[0].message.content))
+            extraction_result = json.loads(generated_text)
+        except json.JSONDecodeError as e:
+            return jsonify({"error": f"Invalid JSON returned from OpenAI: {e}, Raw response: {generated_text}"})
 
     except Exception as e:
         return jsonify({"error": f"An error occurred: {e}"})
