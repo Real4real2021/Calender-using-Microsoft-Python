@@ -6,7 +6,6 @@
     <title>Business Product Insight</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -192,6 +191,17 @@
                 document.getElementById('break-even').textContent = data.revenue_break_even_analysis.break_even_point_units;
                 document.getElementById('total-revenue').textContent = `$${data.revenue_break_even_analysis.total_revenue}`;
 
+                // Add product info header if available
+                if (data.product_information) {
+                    const header = document.querySelector('header div');
+                    const productInfo = document.createElement('div');
+                    productInfo.className = 'text-sm text-gray-600 mt-1';
+                    productInfo.textContent = `${data.product_information.product_name} | ${data.product_information.product_category} | Stage: ${data.product_information.product_lifecycle_stage}`;
+                    if (!header.querySelector('.text-sm')) {
+                        header.appendChild(productInfo);
+                    }
+                }
+
                 // Update charts
                 updateCostChart(data);
                 updateRevenueChart(data);
@@ -202,15 +212,16 @@
                 const ctx = document.getElementById('costChart').getContext('2d');
                 if (charts.costChart) charts.costChart.destroy();
 
+                // Using new structure for fixed and variable costs
+                const fixedCosts = data.cost_profit_analysis.costs.fixed_costs.total_fixed_costs;
+                const variableCosts = data.cost_profit_analysis.costs.variable_costs.total_variable_costs;
+                
                 charts.costChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Fixed Costs', 'Variable Costs'],
                         datasets: [{
-                            data: [
-                                data.revenue_break_even_analysis.fixed_costs,
-                                data.cost_profit_analysis.variable_cost_per_unit
-                            ],
+                            data: [fixedCosts, variableCosts],
                             backgroundColor: ['#3b82f6', '#60a5fa']
                         }]
                     }
@@ -228,7 +239,7 @@
                         datasets: [{
                             data: [
                                 data.revenue_break_even_analysis.total_revenue,
-                                data.cost_profit_analysis.total_cost_per_unit,
+                                data.cost_profit_analysis.total_cost_per_unit * data.revenue_break_even_analysis.total_units_sold,
                                 data.revenue_break_even_analysis.total_profit
                             ],
                             backgroundColor: ['#3b82f6', '#ef4444', '#10b981']
@@ -248,16 +259,49 @@
                 const recommendationsContainer = document.getElementById('recommendations');
                 recommendationsContainer.innerHTML = '';
 
-                data.cost_profit_analysis.recommendations.forEach(rec => {
-                    const recDiv = document.createElement('div');
-                    recDiv.className = 'p-4 bg-blue-50 rounded-lg';
-                    recDiv.innerHTML = `
-                        <h4 class="font-semibold text-blue-800">${rec.area}</h4>
-                        <p class="text-gray-700">${rec.advice}</p>
-                        <p class="text-sm text-blue-600 mt-2">Impact: ${rec.impact}</p>
-                    `;
-                    recommendationsContainer.appendChild(recDiv);
-                });
+                // Add cost-profit recommendations
+                const costRec = data.cost_profit_analysis.recommendations;
+                const recDiv = document.createElement('div');
+                recDiv.className = 'p-4 bg-blue-50 rounded-lg';
+                recDiv.innerHTML = `
+                    <h4 class="font-semibold text-blue-800">${costRec.area}</h4>
+                    <p class="text-gray-700">${costRec.advice}</p>
+                    <p class="text-sm text-blue-600 mt-2">Impact: ${costRec.impact}</p>
+                    ${costRec.priority ? `<p class="text-xs text-gray-500">Priority: ${costRec.priority} | Feasibility: ${costRec.feasibility || 'N/A'}</p>` : ''}
+                `;
+                recommendationsContainer.appendChild(recDiv);
+
+                // Add revenue recommendations
+                const revenueRec = data.revenue_break_even_analysis.recommendations;
+                const revRecDiv = document.createElement('div');
+                revRecDiv.className = 'p-4 bg-blue-50 rounded-lg mt-4';
+                revRecDiv.innerHTML = `
+                    <h4 class="font-semibold text-blue-800">${revenueRec.area}</h4>
+                    <p class="text-gray-700">${revenueRec.advice}</p>
+                    <p class="text-sm text-blue-600 mt-2">Impact: ${revenueRec.impact}</p>
+                    ${revenueRec.priority ? `<p class="text-xs text-gray-500">Priority: ${revenueRec.priority} | Feasibility: ${revenueRec.feasibility || 'N/A'}</p>` : ''}
+                `;
+                recommendationsContainer.appendChild(revRecDiv);
+
+                // Add key findings if available
+                if (data.analysis_summary && data.analysis_summary.key_findings && data.analysis_summary.key_findings.length > 0) {
+                    const findingsDiv = document.createElement('div');
+                    findingsDiv.className = 'p-4 bg-green-50 rounded-lg mt-4';
+                    findingsDiv.innerHTML = '<h4 class="font-semibold text-green-800">Key Findings</h4>';
+                    
+                    const findingsList = document.createElement('ul');
+                    findingsList.className = 'list-disc pl-5 mt-2';
+                    
+                    data.analysis_summary.key_findings.forEach(finding => {
+                        const li = document.createElement('li');
+                        li.className = 'text-gray-700 mb-1';
+                        li.textContent = finding.finding;
+                        findingsList.appendChild(li);
+                    });
+                    
+                    findingsDiv.appendChild(findingsList);
+                    recommendationsContainer.appendChild(findingsDiv);
+                }
             }
 
             async function processSheet(sheetData) {
@@ -279,12 +323,9 @@
                     spinner.classList.add('hidden');
                     calculateButton.disabled = false;
                     calculateButton.classList.remove('opacity-75');
-                    
-                    // Remove the input section
-                    document.querySelector('section.mb-8').remove();
                 } catch (error) {
                     console.error('Error:', error);
-                    // alert('An error occurred while processing the data');
+                    alert('An error occurred while processing the data');
                 }
             }
         });
