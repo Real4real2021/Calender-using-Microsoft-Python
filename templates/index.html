@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Product Insight</title>
+    <title>Login/Register</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -17,318 +16,75 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        .dashboard-card {
+        .auth-container {
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
             margin-bottom: 1rem;
-            transition: transform 0.2s;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .tab-button {
-            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
             border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            
         }
 
-        .tab-button.active {
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-login {
             background-color: var(--primary-color);
             color: white;
+            margin: 10px;
         }
 
-        .metric-card {
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
+        .btn-login:hover {
+            background-color: var(--secondary-color);
         }
     </style>
 </head>
 <body>
-    <header class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-4">
-            <h1 class="text-2xl font-bold text-gray-800">Business Product Insights</h1>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-6">
-        <section class="mb-8">
-            <div class="bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-2xl">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800">Data Input</h2>
-                <form id="product-form" class="space-y-6">
-                    <div class="relative">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Upload Spreadsheet
-                            <span class="ml-1 text-xs text-gray-500">(Excel files only)</span>
-                        </label>
-                        <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 transition-all duration-300 hover:border-blue-500">
-                            <input type="file" id="spreadsheet-upload" accept=".xlsx,.xls" 
-                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            <div class="text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <p class="mt-1 text-sm text-gray-600">Drag and drop or click to select</p>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" id="calculate-button" 
-                            class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-blue-700 transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                        Generate Insights
-                        <span id="loading-spinner" class="hidden ml-2 inline-block animate-spin">⚬</span>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <div id="results-container" class="hidden">
-            <div class="tabs-container mb-4">
-                <div id="sheet-tabs" class="flex space-x-2 mb-4">
-                    <!-- Tabs will be dynamically added here -->
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="metric-card">
-                    <h3 class="text-lg font-semibold mb-2">Profit Margin</h3>
-                    <p class="text-2xl" id="profit-margin">-</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="text-lg font-semibold mb-2">Break Even Point</h3>
-                    <p class="text-2xl" id="break-even">-</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="text-lg font-semibold mb-2">Revenue</h3>
-                    <p class="text-2xl" id="total-revenue">-</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="dashboard-card">
-                    <h3 class="text-lg font-semibold mb-4">Cost Structure</h3>
-                    <canvas id="costChart"></canvas>
-                </div>
-                <div class="dashboard-card">
-                    <h3 class="text-lg font-semibold mb-4">Revenue vs Costs</h3>
-                    <canvas id="revenueChart"></canvas>
-                </div>
-            </div>
-
-            <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Recommendations</h3>
-                <div id="recommendations" class="space-y-4">
-                    <!-- Recommendations will be added here -->
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const calculateButton = document.getElementById('calculate-button');
-            const resultsContainer = document.getElementById('results-container');
-            const sheetTabs = document.getElementById('sheet-tabs');
-            let currentData = null;
-            let charts = {};
-
-            calculateButton.addEventListener('click', async function() {
-                const file = document.getElementById('spreadsheet-upload').files[0];
-                const spinner = document.getElementById('loading-spinner');
-                if (!file) {
-                    alert('Please select a file');
-                    return;
-                }
-                
-                spinner.classList.remove('hidden');
-                calculateButton.disabled = true;
-                calculateButton.classList.add('opacity-75');
-
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: 'binary' });
-
-                    // Clear existing tabs
-                    sheetTabs.innerHTML = '';
-
-                    // Create tabs for each sheet
-                    workbook.SheetNames.forEach((sheetName, index) => {
-                        const tab = document.createElement('button');
-                        tab.className = `tab-button ${index === 0 ? 'active' : ''}`;
-                        tab.textContent = sheetName;
-                        tab.onclick = () => switchTab(sheetName);
-                        sheetTabs.appendChild(tab);
-                    });
-
-                    // Process first sheet
-                    const firstSheet = workbook.SheetNames[0];
-                    processSheet(workbook.Sheets[firstSheet]);
-                };
-                reader.readAsBinaryString(file);
-            });
-
-            function switchTab(sheetName) {
-                // Update active tab
-                document.querySelectorAll('.tab-button').forEach(tab => {
-                    tab.classList.toggle('active', tab.textContent === sheetName);
-                });
-
-                // Update charts and metrics for the selected sheet
-                updateDashboard(currentData[sheetName]);
-            }
-
-            function updateDashboard(data) {
-                // Update metrics
-                document.getElementById('profit-margin').textContent = `${data.revenue_break_even_analysis.profit_margin}%`;
-                document.getElementById('break-even').textContent = data.revenue_break_even_analysis.break_even_point_units;
-                document.getElementById('total-revenue').textContent = `$${data.revenue_break_even_analysis.total_revenue}`;
-
-                // Add product info header if available
-                if (data.product_information) {
-                    const header = document.querySelector('header div');
-                    const productInfo = document.createElement('div');
-                    productInfo.className = 'text-sm text-gray-600 mt-1';
-                    productInfo.textContent = `${data.product_information.product_name} | ${data.product_information.product_category} | Stage: ${data.product_information.product_lifecycle_stage}`;
-                    if (!header.querySelector('.text-sm')) {
-                        header.appendChild(productInfo);
-                    }
-                }
-
-                // Update charts
-                updateCostChart(data);
-                updateRevenueChart(data);
-                updateRecommendations(data);
-            }
-
-            function updateCostChart(data) {
-                const ctx = document.getElementById('costChart').getContext('2d');
-                if (charts.costChart) charts.costChart.destroy();
-
-                // Using new structure for fixed and variable costs
-                const fixedCosts = data.cost_profit_analysis.costs.fixed_costs.total_fixed_costs;
-                const variableCosts = data.cost_profit_analysis.costs.variable_costs.total_variable_costs;
-                
-                charts.costChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Fixed Costs', 'Variable Costs'],
-                        datasets: [{
-                            data: [fixedCosts, variableCosts],
-                            backgroundColor: ['#3b82f6', '#60a5fa']
-                        }]
-                    }
-                });
-            }
-
-            function updateRevenueChart(data) {
-                const ctx = document.getElementById('revenueChart').getContext('2d');
-                if (charts.revenueChart) charts.revenueChart.destroy();
-
-                charts.revenueChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Revenue', 'Costs', 'Profit'],
-                        datasets: [{
-                            data: [
-                                data.revenue_break_even_analysis.total_revenue,
-                                data.cost_profit_analysis.total_cost_per_unit * data.revenue_break_even_analysis.total_units_sold,
-                                data.revenue_break_even_analysis.total_profit
-                            ],
-                            backgroundColor: ['#3b82f6', '#ef4444', '#10b981']
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-
-            function updateRecommendations(data) {
-                const recommendationsContainer = document.getElementById('recommendations');
-                recommendationsContainer.innerHTML = '';
-
-                // Add cost-profit recommendations
-                const costRec = data.cost_profit_analysis.recommendations;
-                const recDiv = document.createElement('div');
-                recDiv.className = 'p-4 bg-blue-50 rounded-lg';
-                recDiv.innerHTML = `
-                    <h4 class="font-semibold text-blue-800">${costRec.area}</h4>
-                    <p class="text-gray-700">${costRec.advice}</p>
-                    <p class="text-sm text-blue-600 mt-2">Impact: ${costRec.impact}</p>
-                    ${costRec.priority ? `<p class="text-xs text-gray-500">Priority: ${costRec.priority} | Feasibility: ${costRec.feasibility || 'N/A'}</p>` : ''}
-                `;
-                recommendationsContainer.appendChild(recDiv);
-
-                // Add revenue recommendations
-                const revenueRec = data.revenue_break_even_analysis.recommendations;
-                const revRecDiv = document.createElement('div');
-                revRecDiv.className = 'p-4 bg-blue-50 rounded-lg mt-4';
-                revRecDiv.innerHTML = `
-                    <h4 class="font-semibold text-blue-800">${revenueRec.area}</h4>
-                    <p class="text-gray-700">${revenueRec.advice}</p>
-                    <p class="text-sm text-blue-600 mt-2">Impact: ${revenueRec.impact}</p>
-                    ${revenueRec.priority ? `<p class="text-xs text-gray-500">Priority: ${revenueRec.priority} | Feasibility: ${revenueRec.feasibility || 'N/A'}</p>` : ''}
-                `;
-                recommendationsContainer.appendChild(revRecDiv);
-
-                // Add key findings if available
-                if (data.analysis_summary && data.analysis_summary.key_findings && data.analysis_summary.key_findings.length > 0) {
-                    const findingsDiv = document.createElement('div');
-                    findingsDiv.className = 'p-4 bg-green-50 rounded-lg mt-4';
-                    findingsDiv.innerHTML = '<h4 class="font-semibold text-green-800">Key Findings</h4>';
-                    
-                    const findingsList = document.createElement('ul');
-                    findingsList.className = 'list-disc pl-5 mt-2';
-                    
-                    data.analysis_summary.key_findings.forEach(finding => {
-                        const li = document.createElement('li');
-                        li.className = 'text-gray-700 mb-1';
-                        li.textContent = finding.finding;
-                        findingsList.appendChild(li);
-                    });
-                    
-                    findingsDiv.appendChild(findingsList);
-                    recommendationsContainer.appendChild(findingsDiv);
-                }
-            }
-
-            async function processSheet(sheetData) {
-                const jsonData = XLSX.utils.sheet_to_json(sheetData);
-
-                try {
-                    const response = await fetch('/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ message: jsonData })
-                    });
-
-                    const result = await response.json();
-                    currentData = result.message;
-                    resultsContainer.classList.remove('hidden');
-                    updateDashboard(result.message);
-                    spinner.classList.add('hidden');
-                    calculateButton.disabled = false;
-                    calculateButton.classList.remove('opacity-75');
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('An error occurred while processing the data');
-                }
-            }
-        });
-    </script>
+    <div class="auth-container">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800 text-center">Login / Register</h2>
+        <form id="auth-form" action="{{url_for('login')}}" method="post">
+            <input type="text" name="username" placeholder="Username" class="input-field">
+            <input type="password" name="password" placeholder="Password" class="input-field">
+            <input type="submit" name="login" value="Login" class="btn btn-login" onclick="setAction('login')">
+            <input type="button" value="Register" class="btn btn-login" onclick="setAction('register')">
+            <input type="button" value="Login with Google" class="btn login-google" onclick="window.location.href='{{url_for('login_google')}}'">
+        </form>
+    </div>
 </body>
+<script>
+    function setAction(action) {
+        let form = document.getElementById('auth-form');
+        if (action === 'login') {
+            form.action = '{{url_for('login')}}';
+            form.method = 'post';
+            form.submit();
+        } else if (action === 'register') {
+            form.action = '{{url_for('register')}}';
+            form.method = 'post';
+            form.submit();
+        }
+    }
+</script>
 </html>
