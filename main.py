@@ -10,7 +10,7 @@ from authlib.integrations.flask_client import OAuth
 from keys import *
 
 app = Flask(__name__)
-app.secret_key = "no3250239u_093852ongw"
+app.secret_key = os.environ.get('secret_key')
 
 template = """
 You are a helpful AI assistant, skilled at providing business product insight based on user input.
