@@ -6,8 +6,6 @@ import json
 import openai 
 from openai import OpenAI
 import re 
-from authlib.integrations.flask_client import OAuth
-from keys import *
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('secret_key')
@@ -30,21 +28,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-oauth = OAuth(app)
-
-google = oauth.register(
-    name='google',
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    server_metadata_uri='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={'scope':'openid profile email'}
-)
-
 #Database Model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(25), unique=True, nullable=False)
-    password_hash = db.Column(db.String(150), nullable=True)
+    password_hash = db.Column(db.String(150), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -94,34 +82,6 @@ def dashboard():
 def logout():
     session.pop('username', None)
     return redirect(url_for('home'))
-
-@app.route('/login/google')
-def login_google():
-    try:
-        redirect_uri = url_for('authorize_google', _external=True)
-        return google.authorize_redirect(redirect_uri)
-    except Exception as e:
-        app.logger.error(f"Error during login:{str(e)}")
-        return "Error occured during login", 500
-    
-@app.route("/authorize/google")
-def authorize_google():
-    token = google.authorize_access_token()
-    userinfo_endpoint = google.server_metadata['userinfo_endpoint']
-    resp = google.get(userinfo_endpoint)
-    user_info = resp.json()
-    username = user_info['email']
-
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        user = User(username=username)
-        db.session.add(user)
-        db.session.commit()
-
-    session['username'] = username
-    session['oauth_token'] = token
-
-    return redirect(url_for('dashboard'))
 
 @app.route('/chat', methods=['POST'])
 def chat():
