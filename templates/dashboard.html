@@ -5,53 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Business Product Insight</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #3b82f6;
-            --background-color: #f3f4f6;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background-color);
-        }
-
-        .dashboard-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: transform 0.2s;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .tab-button {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .tab-button.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .metric-card {
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-        }
-    </style>
 </head>
 <body>
     <header class="bg-white shadow-sm">
@@ -60,8 +16,12 @@
             <a href="{{url_for('logout')}}" class="btn btn-logout">Logout</a>
         </div>
     </header>
+    <a href="{{url_for('agriculture')}}" class="btn btn-agriculture">Agriculture</a>
+    <a href="{{url_for('test')}}" class="btn btn-agriculture">Test</a>
+
     <main class="max-w-7xl mx-auto px-4 py-6">
-        <section class="mb-8">
+
+        <section id="data-input-section" class="mb-8">
             <div class="bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-2xl">
                 <h2 class="text-2xl font-bold mb-6 text-gray-800">Data Input</h2>
                 <form id="product-form" class="space-y-6">
@@ -95,64 +55,449 @@
         </section>
 
         <div id="results-container" class="hidden">
-            <!-- Product Information -->
-            <div id="product-info" class="dashboard-card mb-4">
-                <h2 class="text-xl font-semibold mb-2">Product Information</h2>
+            <!-- Navigation Bar -->
+            <nav class="bg-gray-100 p-4 mb-4">
+                <div class="flex overflow-x-auto whitespace-nowrap">
+                    <a href="#product-overview" class="nav-link active">Product Overview</a>
+                    <a href="#market-analysis" class="nav-link">Market Analysis</a>
+                    <a href="#competitor-analysis" class="nav-link">Competitor Analysis</a>
+                    <a href="#scenario-planning" class="nav-link">Scenario Planning</a>
+                    <a href="#recommendations" class="nav-link">Recommendations</a>
+                    <a href="#risk-assessment" class="nav-link">Risk Assessment</a>
+                    <a href="#operational-efficiency" class="nav-link">Operational Efficiency</a>
+                    <a href="#product-development" class="nav-link">Product Development</a>
+                    <!-- <a href="#sales-performance" class="nav-link">Sales Performance</a>
+                    <a href="#cost-profit-analysis" class="nav-link">Cost Profit Analysis</a>
+                    <a href="#customer-analysis" class="nav-link">Customer Analysis</a>
+                    <a href="#interconnectedness" class="nav-link">Interconnectedness</a>
+                    <a href="#marketing-performance" class="nav-link">Marketing Performance</a>
+                    <a href="#revenue-break-even-analysis" class="nav-link">Revenue Break Even Analysis</a> -->
+                </div>
+            </nav>
+
+            <!-- Product Overview Section -->
+            <div id="product-overview" class="section dashboard-card">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Product Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                    <!-- Key Metrics -->
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Sales Performance</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="overview-sales-performance">$12,500</div>
+                        <p class="text-sm text-gray-500">Last Month</p>
+                    </div>
+
+                    <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Customer Satisfaction</h3>
+                        <div class="text-2xl font-bold text-green-800" id="overview-customer-satisfaction">4.7/5 Stars</div>
+                        <p class="text-sm text-gray-500">Average Rating</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Inventory Levels</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="overview-inventory-levels">250 Units</div>
+                        <p class="text-sm text-gray-500">In Stock</p>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Product ID:</strong>
+                        <span id="product-id" class="text-gray-600">P12345</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Product Name:</strong>
+                        <span id="product-name" class="text-gray-600">Awesome Gadget</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Category:</strong>
+                        <span id="product-category" class="text-gray-600">Electronics</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Launch Date:</strong>
+                        <span id="launch-date" class="text-gray-600">2023-01-15</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Target Market:</strong>
+                        <span id="target-market" class="text-gray-600">Young Adults</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Lifecycle Stage:</strong>
+                        <span id="lifecycle-stage" class="text-gray-600">Growth</span>
+                    </div>
+                    <!--Added elements-->
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Total Sales Revenue (YTD):</strong>
+                        <span id="total-sales-revenue" class="text-gray-600">$500,000</span>
+                    </div>
+
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Customer Acquisition Cost:</strong>
+                        <span id="customer-acquisition-cost" class="text-gray-600">$50</span>
+                    </div>
+
+                    <div class="col-span-full">
+                        <strong class="block font-medium text-gray-700 mb-1">SWOT Analysis Summary:</strong>
+                        <ul class="list-disc pl-5 text-gray-600">
+                            <li><strong>Strengths:</strong> Innovative design, strong brand reputation.</li>
+                            <li><strong>Weaknesses:</strong> Higher price point compared to competitors.</li>
+                            <li><strong>Opportunities:</strong> Expanding into new markets, partnerships.</li>
+                            <li><strong>Threats:</strong> Increasing competition, changing consumer preferences.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Analysis Section -->
+            <div id="market-analysis" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4">Market Analysis</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><strong>Product ID:</strong> <span id="product-id">-</span></div>
-                    <div><strong>Product Name:</strong> <span id="product-name">-</span></div>
-                    <div><strong>Category:</strong> <span id="product-category">-</span></div>
-                    <div><strong>Launch Date:</strong> <span id="launch-date">-</span></div>
-                    <div><strong>Target Market:</strong> <span id="target-market">-</span></div>
-                    <div><strong>Lifecycle Stage:</strong> <span id="lifecycle-stage">-</span></div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Market Size</h3>
+                        <p id="market-size-display">-</p>
+                        <canvas id="market-size-chart"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Market Growth Rate</h3>
+                        <p id="industry-growth-rate"></p>
+                        <p id="market-growth-rate-display">-</p>
+                        <canvas id="market-growth-chart"></canvas>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold mb-2">Key Trends</h3>
+                    <ul id="market-trends-list" class="list-disc pl-5">
+                    </ul>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="metric-card">
-                    <h3 class="text-lg font-semibold mb-2">Profit Margin</h3>
-                    <p class="text-2xl" id="profit-margin">-</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="text-lg font-semibold mb-2">Break Even Point (Units)</h3>
-                    <p class="text-2xl" id="break-even">-</p>
-                </div>
-                <div class="metric-card">
-                    <h3 class="text-lg font-semibold mb-2">Total Revenue</h3>
-                    <p class="text-2xl" id="total-revenue">-</p>
+            <!-- Competitor Analysis Section -->
+            <div id="competitor-analysis" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4">Competitor Analysis</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full leading-normal">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Competitor Name
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Market Share
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Customer Segment Name
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Segment Needs
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Segment Growth Potential
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Segment Profitability
+                                </th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody id="competitor-table-body">
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="dashboard-card">
-                    <h3 class="text-lg font-semibold mb-4">Cost Structure</h3>
-                    <canvas id="costChart"></canvas>
+            <!-- Scenario Planning Section -->
+            <div id="scenario-planning" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4">Scenario Planning</h2>
+                <div class="mb-4">
+                    <label for="marketing-spend" class="block text-gray-700 text-sm font-bold mb-2">Marketing Spend:</label>
+                    <input type="number" id="marketing-spend" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="10000">
                 </div>
-                <div class="dashboard-card">
-                    <h3 class="text-lg font-semibold mb-4">Revenue vs Costs vs Profit</h3>
-                    <canvas id="revenueChart"></canvas>
-                </div>
-            </div>
-
-            <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Recommendations</h3>
-                <div id="recommendations" class="space-y-4">
-                    <!-- Recommendations will be added here -->
+                <button id="run-scenario-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Run Scenario</button>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold mb-2">Projected Revenue</h3>
+                    <p id="projected-revenue">-</p>
+                    <canvas id="scenario-chart"></canvas>
                 </div>
             </div>
 
-            <!-- Analysis Summary -->
-            <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Analysis Summary</h3>
-                <ul id="analysis-summary-list" class="list-disc pl-5">
-                    <!-- Analysis summary will be dynamically added here -->
-                     <li id="key-findings-list"></li>
-                     <li id="executive-summary"></li>
-                </ul>
+            <!-- Recommendations Section -->
+            <div id="recommendations" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4">Recommendations</h2>
+                <div id="recommendations-list" class="space-y-4">
+                    <!-- Recommendations will be dynamically added here -->
+                </div>
             </div>
 
-            <!-- Cost Profit Analysis Section -->
-            <div class="dashboard-card mt-6">
+            <!--Risk Assessment Section -->
+            <!-- html templates/dashboard.html -->
+            <div id="risk-assessment" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Risk Assessment</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Risk Metrics -->
+                    <div class="bg-red-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Average Order Value</h3>
+                        <div class="text-2xl font-bold text-red-800" id="average-order-value">-</div>
+                        <p class="text-sm text-gray-500">Impact on Revenue</p>
+                    </div>
+
+                    <div class="bg-orange-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Sales Conversion Rate</h3>
+                        <div class="text-2xl font-bold text-orange-800" id="sales-conversion-rate">-</div>
+                        <p class="text-sm text-gray-500">Efficiency of Sales Process</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Sales Cycle Length</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="sales-cycle-length">-</div>
+                        <p class="text-sm text-gray-500">Time to Close Deals</p>
+                    </div>
+
+                    <div class="bg-purple-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Sales Growth Rate</h3>
+                        <div class="text-2xl font-bold text-purple-800" id="sales-growth-rate">-</div>
+                        <p class="text-sm text-gray-500">Business Expansion Speed</p>
+                    </div>
+
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Churn Rate</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="churn-rate">-</div>
+                        <p class="text-sm text-gray-500">Customer Attrition Rate</p>
+                    </div>
+
+                    <div class="bg-teal-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Customer Acquisition Cost</h3>
+                        <div class="text-2xl font-bold text-teal-800" id="customer-acquisition-cost">-</div>
+                        <p class="text-sm text-gray-500">Cost to Acquire a Customer</p>
+                    </div>
+                </div>
+
+                 <h3 class="text-lg font-semibold mt-6 mb-2 text-gray-700">Risk Mitigation Effectiveness</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                        <h4 class="font-semibold text-gray-600">Overall Effectiveness</h4>
+                        <div class="text-2xl font-bold text-green-800" id="overall-effectiveness">-</div>
+                        <p class="text-sm text-gray-500">Mitigation Success Rate</p>
+                    </div>
+
+                    <div class="bg-indigo-100 rounded-lg p-4 shadow-md">
+                        <h4 class="font-semibold text-gray-600">Risk Impact Reduction</h4>
+                        <div class="text-2xl font-bold text-indigo-800" id="risk-impact-reduction">-</div>
+                        <p class="text-sm text-gray-500">Reduction in Potential Loss</p>
+                    </div>
+                </div>
+
+                <!-- Risk Table -->
+                <h3 class="text-lg font-semibold mt-6 mb-2 text-gray-700">Key Risk Insights and Mitigation Plans</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full leading-normal">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Risk
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Impact
+                                </th>
+                                 <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Likelihood
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Severity
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Mitigation Plan
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    Low Average Order Value
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <span class="text-red-500">High</span>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <span class="text-orange-500">Medium</span>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <span class="text-yellow-500">Critical</span>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    Implement upselling strategies and product bundling.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    Decreasing Sales Conversion Rate
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <span class="text-orange-500">Medium</span>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <span class="text-green-500">Low</span>
+                                </td>
+                                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <span class="text-red-500">High</span>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    Enhance website UX, optimize landing pages, and offer incentives.
+                                </td>
+                            </tr>
+                            <!-- Add more rows for other risks -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+             <!--Operational Efficiency Section-->
+            <div id="operational-efficiency" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Operational Efficiency</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Defect Rate -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Defect Rate</h3>
+                        <div class="text-3xl font-bold text-red-600" id="defect-rate">-</div>
+                        <p class="text-sm text-gray-500">Percentage of defective products. <br> Target: Below 2%</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-red-400 rounded-full" style="width: 50%"></div> <!-- Example progress -->
+                        </div>
+                    </div>
+
+                    <!-- Inventory Turnover Rate -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Inventory Turnover Rate</h3>
+                        <div class="text-3xl font-bold text-blue-600" id="inventory-turnover-rate">-</div>
+                        <p class="text-sm text-gray-500">How often inventory is sold and replaced. <br> Target: Above 6</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-blue-400 rounded-full" style="width: 75%"></div> <!-- Example progress -->
+                        </div>
+                    </div>
+
+                    <!-- Order Fulfillment Rate -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Order Fulfillment Rate</h3>
+                        <div class="text-3xl font-bold text-green-600" id="order-fulfillment-rate">-</div>
+                        <p class="text-sm text-gray-500">Percentage of orders fulfilled on time. <br> Target: Above 95%</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-green-400 rounded-full" style="width: 90%"></div> <!-- Example progress -->
+                        </div>
+                    </div>
+
+                    <!-- Product Capacity Utilization -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Product Capacity Utilization</h3>
+                        <div class="text-3xl font-bold text-purple-600" id="product-capacity-utilization">-</div>
+                        <p class="text-sm text-gray-500">Percentage of production capacity being used.  <br> Target: Above 80%</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-purple-400 rounded-full" style="width: 60%"></div> <!-- Example progress -->
+                        </div>
+                    </div>
+
+                    <!-- Return Rate -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Return Rate</h3>
+                        <div class="text-3xl font-bold text-orange-600" id="return-rate">-</div>
+                        <p class="text-sm text-gray-500">Percentage of products returned by customers.  <br> Target: Below 5%</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-orange-400 rounded-full" style="width: 25%"></div> <!-- Example progress -->
+                        </div>
+                    </div>
+
+                    <!-- Supply Chain Costs -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Supply Chain Costs</h3>
+                        <div class="text-3xl font-bold text-teal-600" id="supply-chain-costs">-</div>
+                        <p class="text-sm text-gray-500">Total cost of managing the supply chain. <br> Target: Below $X</p>
+                    </div>
+                </div>
+            </div>
+
+             <!--Product Development Section-->
+             <div id="product-development" class="section dashboard-card">
+                <h3 class="text-lg font-semibold mb-4">Product Development</h3>
+            
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+                    <div>
+                        <h4 class="font-semibold text-md mb-2">Development Progress</h4>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-700 mb-1">
+                                <span>Current Stage: <span id="current-stage">-</span></span>
+                                <span>Completion: <span id="development-completion">-</span>%</span>
+                            </div>
+                            <div class="pd-progress-bar">
+                                <div class="pd-progress-bar-fill" id="development-progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div>
+                        <h4 class="font-semibold text-md mb-2">Innovation Metrics</h4>
+                        <div class="mb-2">
+                            <span class="text-sm text-gray-700">Innovation Rate:</span>
+                            <span id="innovation-rate" class="ml-2 font-medium">-</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-sm text-gray-700">New Features Released:</span>
+                            <span id="new-feature-released" class="ml-2 font-medium">-</span>
+                        </div>
+                    </div>
+            
+                    <div>
+                        <h4 class="font-semibold text-md mb-2">Cost & Time</h4>
+                         <div class="mb-2">
+                            <span class="text-sm text-gray-700">Development Cost:</span>
+                            <span id="development-cost" class="ml-2 font-medium">-</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-sm text-gray-700">Time to Market:</span>
+                            <span id="time-to-market" class="ml-2 font-medium">-</span>
+                        </div>
+                    </div>
+                      <div>
+                        <h4 class="font-semibold text-md mb-2">Team Performance</h4>
+                         <div class="mb-2">
+                            <span class="text-sm text-gray-700">Team Size:</span>
+                            <span id="team-size" class="ml-2 font-medium">-</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-sm text-gray-700">Sprint Velocity:</span>
+                            <span id="sprint-velocity" class="ml-2 font-medium">-</span>
+                        </div>
+                    </div>
+            
+            
+                </div>
+            </div>
+
+             <!--Sales Performance Section-->
+             <div id="sales-performance" class="section dashboard-card hidden">
+                <h3 class="text-lg font-semibold mb-4">Sales Performance</h3>
+                <div>
+                    <p><strong>Average Order Value:</strong> <span id="average-order-value">-</span></p>
+                    <p><strong>Sales Conversion Rate:</strong> <span id="sales-conversion-rate">-</span></p>
+                    <p><strong>Sales Cycle Length:</strong> <span id="sales-cycle-length">-</span></p>
+                    <p><strong>Sales Growth Rate:</strong> <span id="sales-growth-rate">-</span></p>
+                    <p><strong>Total Sales Revenue:</strong> <span id="total-sales-revenue">-</span></p>
+                </div>
+             </div>
+
+             <!--Cost Profit Analysis Section-->
+             <div id="cost-profit-analysis" class="section dashboard-card hidden">
                 <h3 class="text-lg font-semibold mb-4">Cost Profit Analysis</h3>
                 <div>
                     <p><strong>Contribution Margin:</strong> <span id="contribution-margin">-</span></p>
@@ -160,11 +505,21 @@
                     <p><strong>Profit Per Unit:</strong> <span id="profit-per-unit">-</span></p>
                     <p><strong>Total Cost Per Unit:</strong> <span id="total-cost-per-unit">-</span></p>
                     <p><strong>Varibale Cost Per Unit:</strong> <span id="varibale-cost-per-unit">-</span></p>
+                    <h3 class="text-lg font-semibold mb-4">Cost Structure</h3>
+                    <canvas id="costChart"></canvas>
                 </div>
-            </div>
+                 <div class="mt-4">
+                    <h3 class="text-lg font-semibold mb-4">Analysis Summary</h3>
+                    <ul id="analysis-summary-list" class="list-disc pl-5">
+                        <!-- Analysis summary will be dynamically added here -->
+                         <li id="key-findings-list"></li>
+                         <li id="executive-summary"></li>
+                    </ul>
+                </div>
+             </div>
 
-            <!-- Customer Analysis -->
-            <div class="dashboard-card mt-6">
+             <!--Customer Analysis Section-->
+             <div id="customer-analysis" class="section dashboard-card hidden">
                 <h3 class="text-lg font-semibold mb-4">Customer Analysis</h3>
                 <div>
                     <p><strong>Churn Rate:</strong> <span id="churn-rate">-</span></p>
@@ -172,10 +527,10 @@
                     <p><strong>Customer Lifetime Value:</strong> <span id="customer-lifetime-value">-</span></p>
                     <p><strong>Customer Retention Rate:</strong> <span id="customer-retention-rate">-</span></p>
                 </div>
-            </div>
+             </div>
 
-            <!-- Interconnectedness Section -->
-             <div class="dashboard-card mt-6">
+             <!--Interconnectedness Section-->
+             <div id="interconnectedness" class="section dashboard-card hidden">
                 <h3 class="text-lg font-semibold mb-4">Interconnectedness</h3>
                 <div>
                     <p><strong>Notes:</strong> <span id="notes">-</span></p>
@@ -183,450 +538,33 @@
                     <div id="scenario-planning-div"></div>
                 </div>
              </div>
-             
-             <!-- Market Analysis Section -->
-             <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Market Analysis</h3>
-                <div>
-                    <p><strong>Market Growth Rate:</strong> <span id="market-growth-rate">-</span></p>
-                    <p><strong>Market Share:</strong> <span id="market-share">-</span></p>
-                    <p><strong>Market Size:</strong> <span id="market-size">-</span></p>
-                </div>
-             </div>
-             
-             <!-- Marketing Performance Section -->
-             <div class="dashboard-card mt-6">
+
+             <!--Marketing Performance Section-->
+             <div id="marketing-performance" class="section dashboard-card hidden">
                 <h3 class="text-lg font-semibold mb-4">Marketing Performance</h3>
                 <div>
                     <p><strong>Marketing ROI:</strong> <span id="marketing-roi">-</span></p>
-                    
+
                 </div>
              </div>
-             
-             <!-- Operational Efficiency Section -->
-             <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Operational Efficiency</h3>
-                <div>
-                    <p><strong>Defect Rate:</strong> <span id="defect-rate">-</span></p>
-                    <p><strong>Inventory Turnover Rate:</strong> <span id="inventory-turnover-rate">-</span></p>
-                    <p><strong>Order Fulfillment Rate:</strong> <span id="order-fulfillment-rate">-</span></p>
-                    <p><strong>Product Capacity Utilization:</strong> <span id="product-capacity-utilization">-</span></p>
-                    <p><strong>Return Rate:</strong> <span id="return-rate">-</span></p>
-                    <p><strong>Supply Chain Costs:</strong> <span id="supply-chain-costs">-</span></p>
-                </div>
-             </div>
-             
-             <!-- Product Development Section -->
-             <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Product Development</h3>
-                <div>
-                    <p><strong>Development Cost:</strong> <span id="development-cost">-</span></p>
-                    <p><strong>Innovation Rate:</strong> <span id="innovation-rate">-</span></p>
-                    <p><strong>New Feature Released:</strong> <span id="new-feature-released">-</span></p> 
-                    <p><strong>Time to Market:</strong> <span id="time-to-market">-</span></p>
-                </div>
-             </div>
-             
-             <!-- Revenue Break Even Analysis Section  -->
-             <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Revenue Break Even Analysis Section</h3>
+
+             <!--Revenue Break Even Analysis Section -->
+             <div id="revenue-break-even-analysis" class="section dashboard-card hidden">
+                <h3 class="text-lg font-semibold mb-4">Revenue Break Even Analysis</h3>
                 <div>
                     <p><strong>Break Even Point Revenue:</strong> <span id="break-even-point-revenue">-</span></p>
                     <p><strong>Break Even Point Units:</strong> <span id="break-even-point-units">-</span></p>
-                    <p><strong>Profit Margin:</strong> <span id="profit-margin">-</span></p> 
+                    <p><strong>Profit Margin:</strong> <span id="profit-margin">-</span></p>
                     <p><strong>Total Profit:</strong> <span id="total-profit">-</span></p>
                     <p><strong>Total Revenue:</strong> <span id="total-revenue">-</span></p>
                     <p><strong>Total Units Sold:</strong> <span id="total-units-sold">-</span></p>
-                </div>
-             </div>
-             
-             <!-- Sales Performance Section -->
-             <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Sales Performance</h3>
-                <div>
-                    <p><strong>Average Order Value:</strong> <span id="average-order-value">-</span></p>
-                    <p><strong>Sales Conversion Rate:</strong> <span id="sales-conversion-rate">-</span></p>
-                    <p><strong>Sales Cycle Length:</strong> <span id="sales-cycle-length">-</span></p>  
-                    <p><strong>Sales Growth Rate:</strong> <span id="sales-growth-rate">-</span></p>
-                    <p><strong>Total Sales Revenue:</strong> <span id="total-sales-revenue">-</span></p>
-                </div>
-             </div>
-             
-             <!-- Risk Assessment Section -->
-             <div class="dashboard-card mt-6">
-                <h3 class="text-lg font-semibold mb-4">Risk Assessment</h3>
-                <h4 class="text-lg font-semibold mb-4">Identified Risks</h4>
-                <div id="identified-risks">
-                    <p><strong>Average Order Value:</strong> <span id="average-order-value">-</span></p>
-                    <p><strong>Sales Conversion Rate:</strong> <span id="sales-conversion-rate">-</span></p>
-                    <p><strong>Sales Cycle Length:</strong> <span id="sales-cycle-length">-</span></p>  
-                    <p><strong>Sales Growth Rate:</strong> <span id="sales-growth-rate">-</span></p>
-                </div>
-                
-                <h4 class="text-lg font-semibold mb-4">Risk Mitigation Effectiveness</h4>
-                <div id="risk-mitigation-effectiveness">
-                    <p><strong>Overall Effectiveness:</strong> <span id="overall-effectiveness">-</span></p> 
+                    <h3 class="text-lg font-semibold mb-4">Revenue vs Costs vs Profit</h3>
+                    <canvas id="revenueChart"></canvas>
                 </div>
              </div>
         </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const calculateButton = document.getElementById('calculate-button');
-            const resultsContainer = document.getElementById('results-container');
-            const sheetTabs = document.getElementById('sheet-tabs');
-            let currentData = null;
-            let charts = {};
-
-            calculateButton.addEventListener('click', async function () {
-                const file = document.getElementById('spreadsheet-upload').files[0];
-                const spinner = document.getElementById('loading-spinner');
-                if (!file) {
-                    alert('Please select a file');
-                    return;
-                }
-
-                spinner.classList.remove('hidden');
-                calculateButton.disabled = true;
-                calculateButton.classList.add('opacity-75');
-
-                const reader = new FileReader();
-                reader.onload = async function (e) {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: 'binary' });
-
-                    // Clear existing tabs
-                    // sheetTabs.innerHTML = '';
-
-                    // Create tabs for each sheet
-                    // workbook.SheetNames.forEach((sheetName, index) => {
-                    //     const tab = document.createElement('button');
-                    //     tab.className = `tab-button ${index === 0 ? 'active' : ''}`;
-                    //     tab.textContent = sheetName;
-                    //     tab.onclick = () => switchTab(sheetName);
-                    //     sheetTabs.appendChild(tab);
-                    // });
-
-                    // Process first sheet
-                    const firstSheet = workbook.SheetNames[0];
-                    processSheet(workbook.Sheets[firstSheet]);
-                };
-                reader.readAsBinaryString(file);
-            });
-
-            function switchTab(sheetName) {
-                // Update active tab
-                document.querySelectorAll('.tab-button').forEach(tab => {
-                    tab.classList.toggle('active', tab.textContent === sheetName);
-                });
-
-                // Update charts and metrics for the selected sheet
-                updateDashboard(currentData); // Removed [sheetName]
-            }
-
-            function updateDashboard(data) {
-                console.log("Data received for updateDashboard:", data);
-                // Product Information
-                if (data && data.product_information) {
-                    document.getElementById('product-id').textContent = data.product_information.product_id || '-';
-                    document.getElementById('product-name').textContent = data.product_information.product_name || '-';
-                    document.getElementById('product-category').textContent = data.product_information.product_category || '-';
-                    document.getElementById('launch-date').textContent = data.product_information.launch_date || '-';
-                    document.getElementById('target-market').textContent = data.product_information.target_market || '-';
-                    document.getElementById('lifecycle-stage').textContent = data.product_information.product_lifecycle_stage || '-';
-                    document.getElementById('contribution-margin').textContent = data.cost_profit_analysis.contribution_margin || '-';
-                    document.getElementById('contribution-margin-ratio').textContent = data.cost_profit_analysis.contributino_margin_ratio || '-';
-                    document.getElementById('profit-per-unit').textContent = data.cost_profit_analysis.profit_per_unit || '-';
-                    document.getElementById('total-cost-per-unit').textContent = data.cost_profit_analysis.total_cost_per_unit || '-';
-                    document.getElementById('varibale-cost-per-unit').textContent = data.cost_profit_analysis.varibale_cost_per_unit || '-';
-                    document.getElementById('churn-rate').textContent = data.customer_analysis.churn_rate || '-';
-                    document.getElementById('customer-acquisition-cost').textContent = data.customer_analysis.customer_acquisition_cost || '-';
-                    document.getElementById('customer-lifetime-value').textContent = data.customer_analysis.customer_lifetime_value || '-';
-                    document.getElementById('customer-retention-rate').textContent = data.customer_analysis.customer_retention_rate || '-';
-                    document.getElementById('notes').textContent = data.interconnectedness.notes || '-';
-                    // document.getElementById('dependency-mapping-div').textContent = data.interconnectedness.dependency_mapping || '-'; 
-                    // document.getElementById('scenario-planning-div').textContent = data.interconnectedness.scenario_planning || '-';
-                    document.getElementById('marketing-roi').textContent = data.marketing_performance.marketing_roi || '-';
-                    document.getElementById('market-share').textContent = data.market_analysis.market_share || '-';
-                    document.getElementById('market-size').textContent = data.market_analysis.market_size || '-';
-                    document.getElementById('market-growth-rate').textContent = data.market_analysis.market_growth_rate || '-';
-                    document.getElementById('defect-rate').textContent = data.operational_efficiency.defect_rate || '-';
-                    document.getElementById('inventory-turnover-rate').textContent = data.operational_efficiency.inventory_turnover_rate || '-';
-                    document.getElementById('order-fulfillment-rate').textContent = data.operational_efficiency.order_fulfillment_rate || '-';
-                    document.getElementById('product-capacity-utilization').textContent = data.operational_efficiency.product_capacity_utilization || '-';
-                    document.getElementById('return-rate').textContent = data.operational_efficiency.return_rate || '-';
-                    document.getElementById('supply-chain-costs').textContent = data.operational_efficiency.supply_chain_costs || '-';
-                    document.getElementById('development-cost').textContent = data.product_development.development_cost || '-'; 
-                    document.getElementById('innovation-rate').textContent = data.product_development.innovation_rate || '-'; 
-                    document.getElementById('new-feature-released').textContent = data.product_development.new_feature_released || '-'; 
-                    document.getElementById('time-to-market').textContent = data.product_development.time_to_market || '-'; 
-                    document.getElementById('break-even-point-revenue').textContent = data.revenue_break_even_analysis.break_even_point_revenue || '-'; 
-                    document.getElementById('break-even-point-units').textContent = data.revenue_break_even_analysis.break_even_point_units || '-'; 
-                    document.getElementById('profit-margin').textContent = data.revenue_break_even_analysis.profit_margin || '-'; 
-                    document.getElementById('total-profit').textContent = data.revenue_break_even_analysis.total_profit || '-'; 
-                    document.getElementById('total-revenue').textContent = data.revenue_break_even_analysis.total_revenue || '-'; 
-                    document.getElementById('total-units-sold').textContent = data.revenue_break_even_analysis.total_units_sold || '-'; 
-                    document.getElementById('average-order-value').textContent = data.sales_performance.average_order_value || '-'; 
-                    document.getElementById('sales-conversion-rate').textContent = data.sales_performance.sales_conversion_rate || '-';  
-                    document.getElementById('sales-cycle-length').textContent = data.sales_performance.sales_cycle_length || '-';  
-                    document.getElementById('sales-growth-rate').textContent = data.sales_performance.sales_growth_rate || '-';  
-                    document.getElementById('total-sales-revenue').textContent = data.sales_performance.total_sales_revenue || '-';   
-                    document.getElementById('overall-effectiveness').textContent = data.risk_assessment.total_sales_revenue || '-';   
-                }
-
-                // Metrics
-                if (data && data.revenue_break_even_analysis) {
-                    document.getElementById('profit-margin').textContent = `${data.revenue_break_even_analysis.profit_margin || 0}%`;
-                    document.getElementById('break-even').textContent = data.revenue_break_even_analysis.break_even_point_units || 0;
-                    document.getElementById('total-revenue').textContent = `$${data.revenue_break_even_analysis.total_revenue || 0}`;
-                }
-
-                // Charts
-                if (data) {
-                    updateCostChart(data);
-                    updateRevenueChart(data);
-                }
-
-                // Recommendations
-                if (data) {
-                    updateRecommendations(data);
-                    updateDependecyMapping(data);
-                    updateScenarioPlanning(data);
-                }
-
-                // Key Findings
-                if (data && data.analysis_summary && data.analysis_summary.key_findings) {
-                    updateKeyFindings(data.analysis_summary.key_findings);
-                }
-
-                // Market Analysis
-                if (data && data.market_analysis) {
-                    document.getElementById('market-size').textContent = data.market_analysis.market_size || '-';
-                    document.getElementById('market-growth-rate').textContent = data.market_analysis.market_growth_rate || '-';
-                    document.getElementById('market-share').textContent = data.market_analysis.market_share || '-';
-                }
-
-                // Executive Summary
-                if (data && data.analysis_summary) {
-                    document.getElementById('executive-summary').textContent = data.analysis_summary.executive_summary || '-';
-                }
-
-            }
-            function updateKeyFindings(findings) {
-                const keyFindingsList = document.getElementById('key-findings-list');
-                keyFindingsList.innerHTML = ''; // Clear existing list
-
-                if (findings && findings.length > 0) {
-                    findings.forEach(finding => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = finding.finding;
-                        keyFindingsList.appendChild(listItem);
-                    });
-                } else {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = "No key findings available.";
-                    keyFindingsList.appendChild(listItem);
-                }
-            }
-
-            function updateCostChart(data) {
-                const ctx = document.getElementById('costChart').getContext('2d');
-                if (charts.costChart) charts.costChart.destroy();
-
-                let fixedCosts = 0;
-                let variableCosts = 0;
-
-                if (data.cost_profit_analysis && data.cost_profit_analysis.costs) {
-                    if (data.cost_profit_analysis.costs.fixed_costs) {
-                        fixedCosts = data.cost_profit_analysis.costs.fixed_costs.total_fixed_costs || 0;
-                    }
-                    if (data.cost_profit_analysis.costs.variable_costs) {
-                        variableCosts = data.cost_profit_analysis.costs.variable_costs.total_variable_costs || 0;
-                    }
-                }
-
-                charts.costChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Fixed Costs', 'Variable Costs'],
-                        datasets: [{
-                            data: [fixedCosts, variableCosts],
-                            backgroundColor: ['#3b82f6', '#60a5fa']
-                        }]
-                    }
-                });
-            }
-
-            function updateRevenueChart(data) {
-                const ctx = document.getElementById('revenueChart').getContext('2d');
-                if (charts.revenueChart) charts.revenueChart.destroy();
-
-                let totalRevenue = 0;
-                let totalCosts = 0;
-                let totalProfit = 0;
-
-                if (data.revenue_break_even_analysis) {
-                    totalRevenue = data.revenue_break_even_analysis.total_revenue || 0;
-                    totalProfit = data.revenue_break_even_analysis.total_profit || 0;
-                }
-                if (data.cost_profit_analysis) {
-                    totalCosts = (data.cost_profit_analysis.total_cost_per_unit || 0) * (data.revenue_break_even_analysis.total_units_sold || 0);
-                }
-                charts.revenueChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Revenue', 'Costs', 'Profit'],
-                        datasets: [{
-                            data: [totalRevenue, totalCosts, totalProfit],
-                            backgroundColor: ['#3b82f6', '#ef4444', '#10b981']
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-
-            function updateRecommendations(data) {
-                const recommendationsContainer = document.getElementById('recommendations');
-                recommendationsContainer.innerHTML = '';
-
-                if (data.cost_profit_analysis && data.cost_profit_analysis.recommendations) {
-                    const costRec = data.cost_profit_analysis.recommendations;
-                    const recDiv = document.createElement('div');
-                    recDiv.className = 'p-4 bg-blue-50 rounded-lg';
-                    recDiv.innerHTML = `
-                    <h4 class="font-semibold text-blue-800">${costRec.area || 'N/A'}</h4>
-                    <p class="text-gray-700">${costRec.advice || 'N/A'}</p>
-                    <p class="text-sm text-blue-600 mt-2">Impact: ${costRec.impact || 'N/A'}</p>
-                    ${costRec.priority ? `<p class="text-xs text-gray-500">Priority: ${costRec.priority} | Feasibility: ${costRec.feasibility || 'N/A'} | Implementaion Timeline: ${costRec.implementation_timeline || 'N/A'}</p>` : ''}
-                `;
-                    recommendationsContainer.appendChild(recDiv);
-                } else {
-                    recommendationsContainer.innerHTML += `<div class="p-4 bg-gray-50 rounded-lg">No cost profit recommendations available.</div>`;
-                }
-
-                if (data.revenue_break_even_analysis && data.revenue_break_even_analysis.recommendations) {
-                    const revenueRec = data.revenue_break_even_analysis.recommendations;
-                    const revRecDiv = document.createElement('div');
-                    revRecDiv.className = 'p-4 bg-blue-50 rounded-lg mt-4';
-                    revRecDiv.innerHTML = `
-                    <h4 class="font-semibold text-blue-800">${revenueRec.area || 'N/A'}</h4>
-                    <p class="text-gray-700">${revenueRec.advice || 'N/A'}</p>
-                    <p class="text-sm text-blue-600 mt-2">Impact: ${revenueRec.impact || 'N/A'}</p>
-                    ${revenueRec.priority ? `<p class="text-xs text-gray-500">Priority: ${revenueRec.priority} | Feasibility: ${revenueRec.feasibility || 'N/A'}</p> | Implementation Timeline: ${revenueRec.implementation_timeline || 'N/A'}</p>` : ''}
-                `;
-                    recommendationsContainer.appendChild(revRecDiv);
-                } else {
-                    recommendationsContainer.innerHTML += `<div class="p-4 bg-gray-50 rounded-lg mt-4">No revenue break even recommendations available.</div>`;
-                }
-            }
-            
-            function updateDependecyMapping(data) {
-                const dependencyMappingDiv = document.getElementById('dependency-mapping-div'); 
-                dependencyMappingDiv.innerHTML = '';
-
-                if (data.interconnectedness && data.interconnectedness.dependency_mapping) {
-                    const depMap = data.interconnectedness.dependency_mapping;
-                    const map = document.createElement('div');
-                    map.className = 'p-4 bg-blue-50 rounded-lg';
-                    map.innerHTML = `
-                    <h4 class="font-semibold text-blue-800">Interconnected Metrics: ${depMap[0].metric_1  || 'N/A'} & ${depMap[0].metric_2 || 'N/A'}</h4>
-                    <p class="text-sm text-blue-600 mt-2">Relationship: ${depMap[0].relationship || 'N/A'}</p>
-                    ${depMap[0].strength}
-                `;
-                dependencyMappingDiv.appendChild(map);
-                } else {
-                    dependencyMappingDiv.innerHTML += `<div class="p-4 bg-gray-50 rounded-lg">No cost profit recommendations available.</div>`;
-                }
-            }
-            
-            function updateScenarioPlanning(data) {
-                const scenarioPlanningDiv = document.getElementById('scenario-planning-div'); 
-                scenarioPlanningDiv.innerHTML = '';
-
-                if (data.interconnectedness && data.interconnectedness.scenario_planning) {
-                    const scePlan = data.interconnectedness.scenario_planning;
-                    const sce = document.createElement('div');
-                    sce.className = 'p-4 bg-blue-50 rounded-lg';
-                    sce.innerHTML = `
-                    <h4 class="font-semibold text-blue-800">Scenario Name: ${scePlan[0].scenario_name || 'N/A'}</h4>
-                    <p class="text-gray-700">${scePlan[0].contingency_plans || 'N/A'}</p>
-                    <p class="text-sm text-blue-600 mt-2">Potential Impacts: ${scePlan[0].potential_impacts || 'N/A'}</p>
-                    <p class="text-xs text-gray-500">Trigger Event: ${scePlan[0].trigger_event || 'N/A'}</p>
-                `;
-                scenarioPlanningDiv.appendChild(sce);
-                } else {
-                    scenarioPlanningDiv.innerHTML += `<div class="p-4 bg-gray-50 rounded-lg">No cost profit recommendations available.</div>`;
-                }
-            }
-            
-            function updateRiskAssessment(data) {
-                const identifiedRisk = document.getElementById('identified-risks');  
-                const riskMitigationEffectiveness = document.getElementById('risk-mitigation-effectiveness');  
-                
-                if (data.risk_assessment && data.risk_assessment.identified_risks) { 
-                    const ideRisk = data.interconnectedness.identified_risks;
-                    const idenDiv = document.createElement('div');
-                    idenDiv.className = 'p-4 bg-blue-50 rounded-lg';
-                    idenDiv.innerHTML = `
-                    <h4 class="font-semibold text-blue-800">Scenario Name: ${ideRisk[0].risk_name || 'N/A'}</h4>
-                    <p class="text-gray-700">${ideRisk[0].description || 'N/A'}</p>
-                    <p class="text-sm text-blue-600 mt-2">Mitigation Strategy: ${ideRisk[0].mitigation_strategy || 'N/A'}</p>
-                    <p class="text-xs text-gray-500">Probability: ${ideRisk[0].probability} | Risk Owner: ${ideRisk[0].risk_owner || 'N/A'}</p> | Impact: ${ideRisk[0].impact || 'N/A'}</p> 
-                `;
-                identifiedRisk.appendChild(riskDiv);
-                } else {
-                    identifiedRisk.innerHTML += `<div class="p-4 bg-gray-50 rounded-lg">No cost profit recommendations available.</div>`;
-                }
-                
-                if (data.risk_assessment && data.risk_assessment.risk_mitigation_effectiveness) { 
-                    const riskMit = data.interconnectedness.risk_mitigation_effectiveness;
-                    const mitDiv = document.createElement('div');
-                    mitDiv.className = 'p-4 bg-blue-50 rounded-lg';
-                    mitDiv.innerHTML = `
-                    <h4 class="font-semibold text-blue-800">Areas Of Improvement: ${riskMit.areas_for_improvement[0] || 'N/A'} & ${riskMit.areas_for_improvement[1] || 'N/A'}</h4> 
-                `;
-                riskMitigationEffectiveness.appendChild(mitDiv);
-                } else {
-                    riskMitigationEffectiveness.innerHTML += `<div class="p-4 bg-gray-50 rounded-lg">No cost profit recommendations available.</div>`;
-                }
-            }
-
-            async function processSheet(sheetData) {
-                const jsonData = XLSX.utils.sheet_to_json(sheetData);
-
-                try {
-                    const response = await fetch('/chat', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ message: jsonData })
-                    });
-
-                    const result = await response.json();
-                    if (result && result.message) {
-                        currentData = result.message;
-                        resultsContainer.classList.remove('hidden');
-                        updateDashboard(result.message);
-                    } else {
-                        alert('Failed to retrieve data or invalid data format.');
-                    }
-
-                    spinner.classList.add('hidden');
-                    calculateButton.disabled = false;
-                    calculateButton.classList.remove('opacity-75');
-                } catch (error) {
-                    console.error('Error:', error);
-                    // alert('An error occurred while processing the data');
-                }
-            }
-        });
-    </script>
+    </main>
 </body>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 </html>
