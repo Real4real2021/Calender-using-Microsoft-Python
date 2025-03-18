@@ -7,8 +7,9 @@ import openai
 from openai import OpenAI
 import re 
 
+
 app = Flask(__name__)
-app.secret_key = os.environ.get('secret_key')
+app.secret_key = "no3250239u_093852ongw"
 
 template = """
 You are a helpful AI assistant, skilled at providing business product insight based on user input.
@@ -32,7 +33,7 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(25), unique=True, nullable=False)
-    password_hash = db.Column(db.String(150), nullable=False)
+    password_hash = db.Column(db.String(150), nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -53,7 +54,7 @@ def login():
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
         session['username'] = username
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('industry'))
     else:
       return render_template("index.html")
 
@@ -70,7 +71,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         session['username'] = username
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('industry'))
     
 @app.route('/dashboard')
 def dashboard():
@@ -78,10 +79,141 @@ def dashboard():
         return render_template('dashboard.html')
     return redirect(url_for('home'))
 
+@app.route('/industry')
+def industry():
+     return render_template('industry.html')
+
+@app.route('/agriculture')
+def agriculture():
+    return render_template('agriculture.html')
+
+@app.route('/test')
+def test():
+    return render_template('test.html')
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('home'))
+
+@app.route('/data', methods=['POST'])
+def data():
+    global context
+    user_input = request.json['message']
+
+    # --- Information Extraction ---
+    extraction_prompt = """
+    ```
+    You are an expert Market Intelligence Analyst AI, specializing in providing comprehensive and accurate data-driven insights for strategic business decisions. Your role is to deliver precise and up-to-date information across various domains, including market trends, industry benchmarks, competitor intelligence, customer insights, supply chain data, demand forecasting, and price optimization.
+
+    **Your core responsibilities include:**
+
+    1.  **Market Trends Analysis:**
+        * Identify and analyze emerging market trends, including technological advancements, shifting consumer behaviors, and macroeconomic factors.
+        * Provide detailed reports on market size, growth rates, and segmentation.
+        * Offer insights into potential opportunities and threats within specific market segments.
+        * Utilize current data from reputable sources such as financial news outlets, government reports, and industry publications.
+
+    2.  **Industry Benchmarks:**
+        * Establish and maintain a database of key industry performance indicators (KPIs).
+        * Compare and contrast the performance of different companies within a specific industry.
+        * Provide insights into best practices and areas for improvement.
+        * Present data in a clear and concise format, including charts and graphs.
+
+    3.  **Competitor Intelligence:**
+        * Gather and analyze information on competitors' strategies, products, pricing, and market share.
+        * Provide detailed competitor profiles, including strengths, weaknesses, opportunities, and threats (SWOT analysis).
+        * Monitor competitor activity and identify potential competitive advantages.
+        * Use publicly available information, financial reports, and news articles to compile accurate competitor data.
+
+    4.  **Customer Insights:**
+        * Analyze customer demographics, psychographics, and purchasing behavior.
+        * Identify customer needs and preferences.
+        * Provide insights into customer satisfaction and loyalty.
+        * Utilize data from surveys, social media, and customer feedback platforms.
+
+    5.  **Supply Chain Data:**
+        * Analyze supply chain performance, including lead times, inventory levels, and transportation costs.
+        * Identify potential supply chain disruptions and risks.
+        * Provide recommendations for optimizing supply chain efficiency.
+        * Gather information from supply chain management systems, logistics providers, and industry reports.
+
+    6.  **Demand Forecasting:**
+        * Develop and implement accurate demand forecasting models.
+        * Provide forecasts for future demand based on historical data, market trends, and other relevant factors.
+        * Identify potential fluctuations in demand and provide recommendations for managing inventory levels.
+        * Utilize statistical analysis and machine learning techniques to generate accurate forecasts.
+
+    7.  **Price Optimization Data:**
+        * Analyze pricing strategies and identify opportunities for optimization.
+        * Provide insights into price elasticity and customer willingness to pay.
+        * Develop pricing models that maximize revenue and profitability.
+        * Use market research, competitor analysis, and cost data to develop optimal pricing strategies.
+
+    **Key Requirements:**
+
+    * **Accuracy:** Provide accurate and reliable data from reputable sources.
+    * **Up-to-dateness:** Ensure that all information is current and reflects the latest market conditions.
+    * **Objectivity:** Present unbiased and objective analysis.
+    * **Clarity:** Communicate complex information in a clear and concise manner.
+    * **Data Visualization:** Utilize charts, graphs, and other visual aids to present data effectively.
+    * **Source Citation:** When providing data, cite the source of the information.
+    * **Data driven:** All conclusions must be supported by data.
+    * **No Hallucinations:** When unsure of an answer, state that you do not know, and do not invent information.
+
+    **When presented with a specific query, please follow these steps:**
+
+    1.  **Clarify:** Ask clarifying questions to ensure you understand the specific requirements of the request.
+    2.  **Gather:** Collect relevant data from reliable sources.
+    3.  **Analyze:** Analyze the data and identify key insights.
+    4.  **Summarize:** Summarize the findings in a clear and concise report.
+    5.  **Present:** Present the information in a user-friendly format, including charts and graphs where appropriate.
+    6.  **Cite:** Cite all sources of information.
+
+    By adhering to these guidelines, you will provide valuable market intelligence that supports informed decision-making.
+    ```
+
+    """
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  
+            messages=[
+                {"role": "system", "content": "You are a financial analyst.  Respond to the user's prompt by providing a detailed business analysis in the format of a JSON object.  Do not include any additional text or formatting.  The JSON must be valid."},
+                {"role": "user", 
+                 "content": extraction_prompt
+                 }
+            ],
+            temperature=0.7, 
+            # max_tokens=1000      
+        )
+
+        if response.choices and response.choices[0].message:
+          generated_text = response.choices[0].message.content
+
+          generated_text = generated_text.replace('\n', '') # Remove newlines
+          generated_text = generated_text.strip('`').strip() 
+          generated_text = generated_text.replace('```json','').strip()
+          generated_text = re.sub(r"^\s*|\s*$", "", generated_text) 
+          generated_text = re.sub(r"[^\x20-\x7E]+", "", generated_text)
+          generated_text = generated_text.replace('\\"', '"') # replace escaped quotes with quotes
+          generated_text = re.sub(r"(?<!\\)\\(?![\"'])", "", generated_text)
+          generated_text = re.sub(r'^[^\{]*', '', generated_text)
+          generated_text = re.sub(r'[^}]*$', '', generated_text)
+        else:
+          raise ValueError("Unexpected response format from OpenAI API.")
+
+        try:
+            print(repr(response.choices[0].message.content))
+            external_data = json.loads(generated_text)
+        except json.JSONDecodeError as e:
+            return jsonify({"error": f"Invalid JSON returned from OpenAI: {e}, Raw response: {generated_text}"})
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {e}"})
+
+    session["market_data"] = external_data
+    return jsonify({"message": external_data})
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -176,7 +308,7 @@ def chat():
           }},
           "recommendations": {{
             "area": "string (e.g., 'Cost Reduction', 'Pricing Optimization')",
-            "advice": "string",
+            "advice": "string" (A detailed, well thought out, specific, actionable, and achievable recommendation for improving the cost structure of the product),
             "impact": "string (e.g., 'Increase profit margin by X%')",
             "priority": "string (e.g., 'High', 'Medium', 'Low')",
             "feasibility": "string (e.g., 'Easy', 'Medium', 'Difficult')",
@@ -213,7 +345,7 @@ def chat():
           }},
           "recommendations": {{
             "area": "string (e.g., 'Revenue Growth', 'Break-Even Optimization')",
-            "advice": "string",
+            "advice": "string"(A detailed, well thought out, specific, actionable, and achievable recommendation for improving the revenue structure of the product),
             "impact": "string (e.g., 'Reduce break-even point by Y units')",
             "priority": "string (e.g., 'High', 'Medium', 'Low')",
             "feasibility": "string (e.g., 'Easy', 'Medium', 'Difficult')",
@@ -229,8 +361,42 @@ def chat():
               "trend": "string",
               "impact_on_product": "string (e.g., 'Positive', 'Negative', 'Neutral')",
               "opportunity_or_threat": "string (e.g., 'Opportunity', 'Threat')"
+            }},
+            {{
+              "trend": "string",
+              "impact_on_product": "string (e.g., 'Positive', 'Negative', 'Neutral')",
+              "opportunity_or_threat": "string (e.g., 'Opportunity', 'Threat')"
+            }},
+            {{
+              "trend": "string",
+              "impact_on_product": "string (e.g., 'Positive', 'Negative', 'Neutral')",
+              "opportunity_or_threat": "string (e.g., 'Opportunity', 'Threat')"
+            }},
+            {{
+              "trend": "string",
+              "impact_on_product": "string (e.g., 'Positive', 'Negative', 'Neutral')",
+              "opportunity_or_threat": "string (e.g., 'Opportunity', 'Threat')"
             }}
           ],
+          "market_segments": 
+            {{
+              "segment_A(Name of segment)": "number (total market value or units)",
+              "segment_B(Name of segment)": "number (total market value or units)",
+              "segment_C(Name of segment)": "number (total market value or units)",
+              "segment_D(Name of segment)": "number (total market value or units)",
+              "segment_E(Name of segment)": "number (total market value or units)",
+              "segment_F(Name of segment)": "number (total market value or units)",
+              "segment_G(Name of segment)": "number (total market value or units)",
+            }},
+            "historical_growth": {{
+              "2019": "number (percentage)",
+              "2020": "number (percentage)",
+              "2021": "number (percentage)",
+              "2022": "number (percentage)",
+              "2023": "number (percentage)",
+              "2024": "number (percentage)",
+              "2025 5000000": "number (percentage)",
+            }},
           "competitor_analysis": {{
             "competitor_name": "string",
             "market_share": "number (percentage)",
