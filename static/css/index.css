@@ -1,0 +1,159 @@
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #1e40af;
+    --accent-color: #3b82f6;
+    --background-color: #f3f4f6;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tab-button.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.metric-card {
+    /* Old style */
+    /*background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);*/
+
+    /* Keeping same background and text color for metric cards */
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #374151; /* Default text color */
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-block; /* Ensure inline behavior */
+}
+
+.nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.section {
+    padding: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Optional: Add hover effect to the overview details */
+#product-overview div[class*="col-span-full"] {
+    transition: background-color 0.2s ease-in-out;
+    padding: 0.5rem;
+}
+
+#product-overview div[class*="col-span-full"]:hover {
+    background-color: rgba(0, 0, 0, 0.03); /* Very light gray */
+}
+
+/* Add spacing between nav links */
+.nav-link {
+    margin-right: 0.5rem; /* Adjust spacing as needed */
+}
+
+/* static/css/index.css */
+/* Add risk-related color classes */
+.risk-high {
+    color: red;
+}
+
+.risk-medium {
+    color: orange;
+}
+
+.risk-low {
+    color: green;
+}
+
+.progress-bar {
+    height: 0.5rem;
+    background-color: #e5e7eb; /* Gray-200 */
+    border-radius: 0.25rem;
+    overflow: hidden; /* Prevents rounded corners overflowing */
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #4f46e5; /* Indigo-500, adjust as needed */
+    width: 0%; /* Set dynamically using JavaScript */
+    transition: width 0.4s ease-in-out;
+}
+
+/* Existing CSS... */
+
+/* Product Development Section */
+#product-development {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+#product-development h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+#product-development h4 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+#product-development p {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 0.25rem;
+}
+
+/* Progress Bar Styling */
+.pd-progress-bar {
+    background-color: #f3f4f6;
+    border-radius: 0.375rem;
+    height: 0.5rem;
+    overflow: hidden;
+}
+
+.pd-progress-bar-fill {
+    height: 100%;
+    width: 0%; /* Set dynamically via JavaScript */
+    background-color: #4f46e5;  /*Indigo-500*/
+    transition: width 0.3s ease-in-out;
+}
