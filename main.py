@@ -238,7 +238,20 @@ def chat():
           "launch_date": "string (YYYY-MM-DD)",
           "target_market": "string (description of the target audience)",
           "product_lifecycle_stage": "string (e.g., 'Introduction', 'Growth', 'Maturity', 'Decline')",
-          "product_line": "string (if part of a larger product line, optional)"
+          "product_line": "string (if part of a larger product line, optional)",
+          "swot_analysis": {{
+              "strengths": [
+                "list of product internal strengths as strings"
+              ],
+              "weaknesses": [
+                "list of product internal weaknesses as strings"
+              ],
+              "opportunities": [
+                "list of product external opportunities as strings"
+              ],
+              "threats": [
+                "list of product external threats as strings"
+              ]
         }},
         "analysis_period": {{
           "start_date": "string (YYYY-MM-DD)",
@@ -313,6 +326,22 @@ def chat():
             "priority": "string (e.g., 'High', 'Medium', 'Low')",
             "feasibility": "string (e.g., 'Easy', 'Medium', 'Difficult')",
             "implementation_timeline": "string (e.g., 'Short-term', 'Mid-term', 'Long-term')"
+          }},
+          {{
+            "area": "string (e.g., 'Cost Reduction', 'Pricing Optimization')",
+            "advice": "string" (A detailed, well thought out, specific, actionable, and achievable recommendation for improving the cost structure of the product),
+            "impact": "string (e.g., 'Increase profit margin by X%')",
+            "priority": "string (e.g., 'High', 'Medium', 'Low')",
+            "feasibility": "string (e.g., 'Easy', 'Medium', 'Difficult')",
+            "implementation_timeline": "string (e.g., 'Short-term', 'Mid-term', 'Long-term')"
+          }},
+          {{
+            "area": "string (e.g., 'Cost Reduction', 'Pricing Optimization')",
+            "advice": "string" (A detailed, well thought out, specific, actionable, and achievable recommendation for improving the cost structure of the product),
+            "impact": "string (e.g., 'Increase profit margin by X%')",
+            "priority": "string (e.g., 'High', 'Medium', 'Low')",
+            "feasibility": "string (e.g., 'Easy', 'Medium', 'Difficult')",
+            "implementation_timeline": "string (e.g., 'Short-term', 'Mid-term', 'Long-term')"
           }}
         }},
         "revenue_break_even_analysis": {{
@@ -350,7 +379,24 @@ def chat():
             "priority": "string (e.g., 'High', 'Medium', 'Low')",
             "feasibility": "string (e.g., 'Easy', 'Medium', 'Difficult')",
             "implementation_timeline": "string (e.g., 'Short-term', 'Mid-term', 'Long-term')"
-          }}
+          }},
+          {{
+            "area": "string (e.g., 'Revenue Growth', 'Break-Even Optimization')",
+            "advice": "string"(A detailed, well thought out, specific, actionable, and achievable recommendation for improving the revenue structure of the product),
+            "impact": "string (e.g., 'Reduce break-even point by Y units')",
+            "priority": "string (e.g., 'High', 'Medium', 'Low')",
+            "feasibility": "string (e.g., 'Easy', 'Medium', 'Difficult')",
+            "implementation_timeline": "string (e.g., 'Short-term', 'Mid-term', 'Long-term')"
+          }},
+          {{
+            "area": "string (e.g., 'Revenue Growth', 'Break-Even Optimization')",
+            "advice": "string"(A detailed, well thought out, specific, actionable, and achievable recommendation for improving the revenue structure of the product),
+            "impact": "string (e.g., 'Reduce break-even point by Y units')",
+            "priority": "string (e.g., 'High', 'Medium', 'Low')",
+            "feasibility": "string (e.g., 'Easy', 'Medium', 'Difficult')",
+            "implementation_timeline": "string (e.g., 'Short-term', 'Mid-term', 'Long-term')"
+          }},
+          
         }},
         "market_analysis": {{
           "market_size": "number (total market value or units)",
@@ -652,6 +698,29 @@ def chat():
           "identified_risks": [
             {{
               "risk_name": "string",
+              "severity": "string (e.g.,'Critical', 'High', 'Medium', 'Low')",
+              "description": "string",
+              "probability": "string (e.g., 'High', 'Medium', 'Low')",
+              "impact": "string (e.g., 'High', 'Medium', 'Low')",
+              "mitigation_strategy": "string",
+              "risk_owner": "string (person or team responsible)"
+            }}
+          ],
+          [
+            {{
+              "risk_name": "string",
+              "severity": "string (e.g.,'Critical', 'High', 'Medium', 'Low')",
+              "description": "string",
+              "probability": "string (e.g., 'High', 'Medium', 'Low')",
+              "impact": "string (e.g., 'High', 'Medium', 'Low')",
+              "mitigation_strategy": "string",
+              "risk_owner": "string (person or team responsible)"
+            }}
+          ],
+          [
+            {{
+              "risk_name": "string",
+              "severity": "string (e.g.,'Critical', 'High', 'Medium', 'Low')",
               "description": "string",
               "probability": "string (e.g., 'High', 'Medium', 'Low')",
               "impact": "string (e.g., 'High', 'Medium', 'Low')",
@@ -661,6 +730,7 @@ def chat():
           ],
           "risk_mitigation_effectiveness": {{
             "overall_effectiveness": "string (e.g., 'Effective', 'Partially Effective', 'Ineffective')",
+            "mitigation_success_rate": "number (percentage)",
             "areas_for_improvement": [
               "list of areas as strings"
             ]
