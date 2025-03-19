@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const industry = localStorage.getItem('industry');
-    console.log(industry)
+    // console.log(industry)
     const calculateButton = document.getElementById('calculate-button');
     const resultsContainer = document.getElementById('results-container');
     const sheetTabs = document.getElementById('sheet-tabs');
@@ -144,9 +144,9 @@ function updateCompetitorAnalysis(data) {
         return;
     }
 
-    console.log(data.market_analysis)
+    // console.log(data.market_analysis)
     const competitorData = data.market_analysis.competitor_analysis
-    console.log("Competitor data:",competitorData);
+    // console.log("Competitor data:",competitorData);
     const tableBody = document.getElementById('competitor-table-body');
     tableBody.innerHTML = ''; // Clear existing table
 
@@ -183,11 +183,11 @@ function updateCompetitorAnalysis(data) {
 }
 
 function updateScenarioPlanningElements(data) {
-  console.log("Scenario planning element data:",data);
+//   console.log("Scenario planning element data:",data);
   //   document.getElementById('projected-revenue').textContent = data.scenario_planning.projected_revenue;
 }
 function updateScenarioPlanning(data) {
-  console.log("Update Scenario planning data:", data);
+//   console.log("Update Scenario planning data:", data);
     const marketingSpendInput = document.getElementById('marketing-spend');
     const runScenarioButton = document.getElementById('run-scenario-button');
     const projectedRevenueDisplay = document.getElementById('projected-revenue');
@@ -279,7 +279,8 @@ function updateRecommendations(data) {
   }
 
   allRecommendations.forEach(areaRecommendation => {
-    areaRecommendation.recommendations.forEach(recommendation => {
+    console.log(areaRecommendation);
+    areaRecommendation.recommendations[0].forEach(recommendation => {
         const recDiv = document.createElement('div');
         recDiv.className = 'p-4 bg-blue-50 rounded-lg';
         recDiv.innerHTML = `
@@ -409,7 +410,7 @@ function updateRevenueChart(data) {
             return;
         }
 
-        console.log("Data received for updateDashboard:", data);
+        // console.log("Data received for updateDashboard:", data);
 
         // Update each section of the dashboard
         updateProductInformation(data.product_information);
@@ -425,14 +426,29 @@ function updateRevenueChart(data) {
         
 
         function updateProductInformation(productInfo) {
-            if (!productInfo) return;
+            const info = data.product_information
 
-            document.getElementById('product-id').textContent = productInfo.product_id || '-';
-            document.getElementById('product-name').textContent = productInfo.product_name || '-';
-            document.getElementById('product-category').textContent = productInfo.product_category || '-';
-            document.getElementById('launch-date').textContent = productInfo.launch_date || '-';
-            document.getElementById('target-market').textContent = productInfo.target_market || '-';
-            document.getElementById('lifecycle-stage').textContent = productInfo.product_lifecycle_stage || '-';
+            document.getElementById('product-id').textContent = info.product_id || '-';
+            document.getElementById('product-name').textContent = info.product_name || '-';
+            document.getElementById('product-category').textContent = info.product_category || '-';
+            document.getElementById('launch-date').textContent = info.launch_date || '-';
+            document.getElementById('target-market').textContent = info.target_market || '-';
+            document.getElementById('lifecycle-stage').textContent = info.product_lifecycle_stage || '-';
+
+            const swotDiv = document.getElementById('swot-analysis-div');
+
+
+           const ulElement = document.createElement('ul')
+           ulElement.classList.add('list-disc', 'pl-5', 'text-gray-600');
+           ulElement.innerHTML = `
+           <li><strong>Strengths:</strong>${info.swot_analysis.strengths}</li>
+           <li><strong>Weaknesses:</strong>${info.swot_analysis.weaknesses}</li>
+           <li><strong>Opportunities:</strong>${info.swot_analysis.opportunities}</li>
+           <li><strong>Threats:</strong>${info.swot_analysis.threats}</li>
+           `;
+
+           swotDiv.appendChild(ulElement)
+            
         }
         function updateRevenueBreakEvenAnalysis(revenueBreakEvenAnalysis) {
             if (!revenueBreakEvenAnalysis) return;
@@ -494,51 +510,74 @@ function updateRevenueChart(data) {
         }
 
         function updateOperationalEfficiency(operationalEfficiency) {
-            if (!operationalEfficiency) return;
 
-            document.getElementById('defect-rate').textContent = operationalEfficiency.defect_rate || '-';
-            document.getElementById('inventory-turnover-rate').textContent = operationalEfficiency.inventory_turnover_rate || '-';
-            document.getElementById('order-fulfillment-rate').textContent = operationalEfficiency.order_fulfillment_rate || '-';
-            document.getElementById('product-capacity-utilization').textContent = operationalEfficiency.product_capacity_utilization || '-';
-            document.getElementById('return-rate').textContent = operationalEfficiency.return_rate || '-';
-            document.getElementById('supply-chain-costs').textContent = operationalEfficiency.supply_chain_costs || '-';
+            document.getElementById('defect-rate').textContent = data.operational_efficiency.defect_rate || '-';
+            document.getElementById('inventory-turnover-rate').textContent = data.operational_efficiency.inventory_turnover_rate || '-';
+            document.getElementById('order-fulfillment-rate').textContent = data.operational_efficiency.order_fulfillment_time || '-';
+            document.getElementById('product-capacity-utilization').textContent = data.operational_efficiency.production_capacity_utilization || '-';
+            document.getElementById('return-rate').textContent = data.operational_efficiency.return_rate || '-';
+            document.getElementById('supply-chain-costs').textContent = data.operational_efficiency.supply_chain_costs || '-';
         }
 
         function updateRiskAssessment(riskAssessment) {
-            if (!riskAssessment) return;
+            // if (!riskAssessment) return;
+            const riskAssesment = data.risk_assessment;
+            // console.log(riskAssesment)
+            for(let i = 0; i<riskAssesment.identified_risks.length;i++){
+                // console.log(riskAssesment.identified_risks[i].risk_name);
+                let risk = riskAssesment.identified_risks[i];
+                let tableHTML = `
+                <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${risk.risk_name || 'N/A'}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${risk.impact || 'N/A'}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${risk.probability || 'N/A'}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${risk.severity || 'N/A'}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">${risk.mitigation_strategy || 'N/A'}</td>
+                </tr>
+                 `
+                // console.log(tableHTML);
+                document.getElementById('risk-table-body').innerHTML += tableHTML;    
+            }
 
             // Ensure identified_risks is an array before iterating
-            if (Array.isArray(riskAssessment.identified_risks)) {
-                const identifiedRisksDiv = document.getElementById('identified-risks');
-                identifiedRisksDiv.innerHTML = ''; // Clear existing content
+            // if (Array.isArray(riskAssessment.identified_risks)) {
+            //     const identifiedRisksDiv = document.getElementById('identified-risks');
+            //     identifiedRisksDiv.innerHTML = ''; // Clear existing content
 
-                riskAssessment.identified_risks.forEach(risk => {
-                    const riskDiv = document.createElement('div');
-                    riskDiv.innerHTML = `
-                        <p><strong>Risk Name:</strong> ${risk.risk_name || 'N/A'}</p>
-                        <p><strong>Description:</strong> ${risk.description || 'N/A'}</p>
-                        <p><strong>Mitigation Strategy:</strong> ${risk.mitigation_strategy || 'N/A'}</p>
-                    `;
-                    identifiedRisksDiv.appendChild(riskDiv);
-                });
-            } else {
-                document.getElementById('identified-risks').innerHTML = '<p>No identified risks available.</p>';
-            }
+            //     riskAssessment.identified_risks.forEach(risk => {
+            //         const riskDiv = document.createElement('div');
+            //         riskDiv.innerHTML = `
+            //             <p><strong>Risk Name:</strong> ${risk.risk_name || 'N/A'}</p>
+            //             <p><strong>Description:</strong> ${risk.description || 'N/A'}</p>
+            //             <p><strong>Mitigation Strategy:</strong> ${risk.mitigation_strategy || 'N/A'}</p>
+            //         `;
+            //         identifiedRisksDiv.appendChild(riskDiv);
+            //     });
+            // } else {
+            //     document.getElementById('identified-risks').innerHTML = '<p>No identified risks available.</p>';
+            // }
 
-            document.getElementById('overall-effectiveness').textContent = riskAssessment.overall_effectiveness || '-';
-            if(data.external_risk_data && Array.isArray(data.external_risk_data)){
-                data.external_risk_data.forEach(risk=>{
-                    const riskDiv = document.createElement('div');
-                    riskDiv.innerHTML = `
-                        <p><strong>External Risk:</strong> ${risk.risk_name || 'N/A'}</p>
-                        <p><strong>Source:</strong> ${risk.source || 'N/A'}</p>
-                        <p><strong>Severity:</strong> ${risk.severity || 'N/A'}</p>
-                        <p><strong>Impact:</strong> ${risk.potential_impact || 'N/A'}</p>
-                    `;
-                    identifiedRisksDiv.appendChild(riskDiv);
-                })
-            }
-            
+            // document.getElementById('overall-effectiveness').textContent = riskAssessment.overall_effectiveness || '-';
+            // if(data.external_risk_data && Array.isArray(data.external_risk_data)){
+            //     data.external_risk_data.forEach(risk=>{
+            //         const riskDiv = document.createElement('div');
+            //         riskDiv.innerHTML = `
+            //             <p><strong>External Risk:</strong> ${risk.risk_name || 'N/A'}</p>
+            //             <p><strong>Source:</strong> ${risk.source || 'N/A'}</p>
+            //             <p><strong>Severity:</strong> ${risk.severity || 'N/A'}</p>
+            //             <p><strong>Impact:</strong> ${risk.potential_impact || 'N/A'}</p>
+            //         `;
+            //         identifiedRisksDiv.appendChild(riskDiv);
+            //     })
+            // }
+            console.log(data)
+            document.getElementById('average-order-value').textContent = data.sales_performance.average_order_value || '-';
+            document.getElementById('sales-conversion-rate').textContent = data.sales_performance.sales_conversion_rate || '-';
+            document.getElementById('sales-cycle-length').textContent = data.sales_performance.sales_cycle_length || '-';
+            document.getElementById('sales-growth-rate').textContent = data.sales_performance.sales_growth_rate || '-';
+            document.getElementById('churn-rate').textContent = data.customer_analysis.churn_rate || '-';  
+            document.getElementById('customer-acquisition-cost').textContent = data.customer_analysis.customer_acquisition_cost || '-';
+            document.getElementById('overall-effectiveness').textContent = data.risk_assessment.risk_mitigation_effectiveness.overall_effectiveness || '-';
         }
     }
 
@@ -609,13 +648,6 @@ function updateRevenueChart(data) {
                         section.classList.remove('hidden');
                     });
                     
-                    // Populate with dummy data for demonstration
-                    document.getElementById('product-id').textContent = 'PRD-001';
-                    document.getElementById('product-name').textContent = 'Premium Widget X';
-                    document.getElementById('product-category').textContent = 'Electronics';
-                    document.getElementById('launch-date').textContent = '2023-01-15';
-                    document.getElementById('target-market').textContent = 'Small Businesses';
-                    document.getElementById('lifecycle-stage').textContent = 'Growth';
                     
                     // Initialize charts (if Chart.js is loaded)
                     if (typeof Chart !== 'undefined') {
@@ -1014,7 +1046,7 @@ function updateRevenueChart(data) {
     // });
     async function fetchData() {
         const industry = localStorage.getItem('industry');
-        console.log(industry)
+        // console.log(industry)
         try {
           const message = industry
           const response = await fetch('/data', {
@@ -1034,7 +1066,7 @@ function updateRevenueChart(data) {
           if (data.error) {
             console.error('Error from server:', data.error);
           } else if (data.message) {
-            console.log('Data from server:', data.message);
+            // console.log('Data from server:', data.message);
           } else {
             console.warn('Unexpected response structure:', data);
           }
@@ -1050,7 +1082,7 @@ function updateRevenueChart(data) {
         event.preventDefault(); 
         alert('industry selected')
         const selectedIndustry = document.getElementById('industry').value;
-        console.log(selectedIndustry)
+        // console.log(selectedIndustry)
 
         localStorage.setItem('industry', selectedIndustry);
 
