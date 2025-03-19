@@ -279,7 +279,7 @@ function updateRecommendations(data) {
   }
 
   allRecommendations.forEach(areaRecommendation => {
-    console.log(areaRecommendation);
+    // console.log(areaRecommendation);
     areaRecommendation.recommendations[0].forEach(recommendation => {
         const recDiv = document.createElement('div');
         recDiv.className = 'p-4 bg-blue-50 rounded-lg';
@@ -570,14 +570,14 @@ function updateRevenueChart(data) {
             //         identifiedRisksDiv.appendChild(riskDiv);
             //     })
             // }
-            console.log(data)
+            // console.log(data)
             document.getElementById('average-order-value').textContent = data.sales_performance.average_order_value || '-';
             document.getElementById('sales-conversion-rate').textContent = data.sales_performance.sales_conversion_rate || '-';
             document.getElementById('sales-cycle-length').textContent = data.sales_performance.sales_cycle_length || '-';
             document.getElementById('sales-growth-rate').textContent = data.sales_performance.sales_growth_rate || '-';
             document.getElementById('churn-rate').textContent = data.customer_analysis.churn_rate || '-';  
             document.getElementById('customer-acquisition-cost').textContent = data.customer_analysis.customer_acquisition_cost || '-';
-            document.getElementById('overall-effectiveness').textContent = data.risk_assessment.risk_mitigation_effectiveness.overall_effectiveness || '-';
+            document.getElementById('overall-effectiveness').textContent = data.risk_assessment.risk_mitigation_effectiveness.mitigation_success_rate || '-';
         }
     }
 
