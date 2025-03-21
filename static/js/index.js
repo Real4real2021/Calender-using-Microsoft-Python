@@ -413,7 +413,7 @@ function updateRevenueChart(data) {
         // console.log("Data received for updateDashboard:", data);
 
         // Update each section of the dashboard
-        updateProductInformation(data.product_information);
+        updateProductInformation(data);
         updateMarketAnalysis(data); // Ensure this handles undefined gracefully
         updateCompetitorAnalysis(data);
         updateScenarioPlanning(data); // Ensure this handles undefined gracefully
@@ -425,15 +425,13 @@ function updateRevenueChart(data) {
         updateCostProfitAnalysis(data.cost_profit_analysis);
         
 
-        function updateProductInformation(productInfo) {
-            const info = data.product_information
-
-            document.getElementById('product-id').textContent = info.product_id || '-';
-            document.getElementById('product-name').textContent = info.product_name || '-';
-            document.getElementById('product-category').textContent = info.product_category || '-';
-            document.getElementById('launch-date').textContent = info.launch_date || '-';
-            document.getElementById('target-market').textContent = info.target_market || '-';
-            document.getElementById('lifecycle-stage').textContent = info.product_lifecycle_stage || '-';
+        function updateProductInformation(info) {
+           document.getElementById('product-id').textContent = data.product_information.product_id || '-';
+            document.getElementById('product-name').textContent = data.product_information.product_name || '-';
+            document.getElementById('product-category').textContent = data.product_information.product_category || '-';
+            document.getElementById('launch-date').textContent = data.product_information.launch_date || '-';
+            document.getElementById('target-market').textContent = data.product_information.target_market || '-';
+            document.getElementById('lifecycle-stage').textContent = data.product_information.product_lifecycle_stage || '-';
 
             const swotDiv = document.getElementById('swot-analysis-div');
 
@@ -441,10 +439,10 @@ function updateRevenueChart(data) {
            const ulElement = document.createElement('ul')
            ulElement.classList.add('list-disc', 'pl-5', 'text-gray-600');
            ulElement.innerHTML = `
-           <li><strong>Strengths:</strong>${info.swot_analysis.strengths}</li>
-           <li><strong>Weaknesses:</strong>${info.swot_analysis.weaknesses}</li>
-           <li><strong>Opportunities:</strong>${info.swot_analysis.opportunities}</li>
-           <li><strong>Threats:</strong>${info.swot_analysis.threats}</li>
+           <li><strong>Strengths:</strong>${data.product_information.swot_analysis.strengths}</li>
+           <li><strong>Weaknesses:</strong>${data.product_information.swot_analysis.weaknesses}</li>
+           <li><strong>Opportunities:</strong>${data.product_information.swot_analysis.opportunities}</li>
+           <li><strong>Threats:</strong>${data.product_information.swot_analysis.threats}</li>
            `;
 
            swotDiv.appendChild(ulElement)
