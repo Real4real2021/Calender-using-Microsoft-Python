@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Product Insight</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <h1 class="text-2xl font-bold text-gray-800">Manufacturing Operations Dashboard</h1>
+            <a href="{{url_for('logout')}}" class="btn btn-logout">Logout</a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+
+        <section id="data-input-section" class="mb-8">
+            <div class="bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-2xl">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">Data Input</h2>
+                <form id="product-form" class="space-y-6">
+                    <div class="relative">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Upload Spreadsheet
+                            <span class="ml-1 text-xs text-gray-500">(Excel files only)</span>
+                        </label>
+                        <div
+                            class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 transition-all duration-300 hover:border-blue-500">
+                            <input type="file" id="spreadsheet-upload" accept=".xlsx,.xls"
+                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            <div class="text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
+                                    viewBox="0 0 48 48">
+                                    <path
+                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <p class="mt-1 text-sm text-gray-600">Drag and drop or click to select</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="manufacturing-button"
+                        class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-blue-700 transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                        Generate Insights
+                        <span id="loading-spinner" class="hidden ml-2 inline-block animate-spin">⚬</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <div id="results-container" class="hidden">
+            <!-- Navigation Bar -->
+            <nav class="bg-gray-100 p-4 mb-4">
+                <div class="flex overflow-x-auto whitespace-nowrap">
+                    <a href="#plant-overview" class="nav-link active">Plant Overview</a>
+                    <a href="#production-monitoring" class="nav-link">Production Monitoring</a>
+                    <a href="#quality-control" class="nav-link">Quality Control</a>
+                    <a href="#equipment-performance" class="nav-link">Equipment Performance</a>
+                    <a href="#inventory-management" class="nav-link">Inventory Management</a>
+                    <a href="#maintenance-management" class="nav-link">Maintenance Management</a>
+                    <a href="#financial-performance" class="nav-link">Financial Performance</a>
+                    <a href="#supply-chain" class="nav-link">Supply Chain</a>
+                    <a href="#sustainability" class="nav-link">Sustainability</a>
+                    <!-- <a href="#cost-profit-analysis" class="nav-link">Cost Profit Analysis</a>
+                    <a href="#customer-analysis" class="nav-link">Customer Analysis</a>
+                    <a href="#interconnectedness" class="nav-link">Interconnectedness</a>
+                    <a href="#marketing-performance" class="nav-link">Marketing Performance</a>
+                    <a href="#revenue-break-even-analysis" class="nav-link">Revenue Break Even Analysis</a> -->
+                </div>
+            </nav>
+
+            <!-- Plant Overview Section -->
+            <div id="plant-overview" class="section dashboard-card">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Product Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                    <!-- Key Metrics -->
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Production Output</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="production-output">$12,500</div>
+                        <p class="text-sm text-gray-500">Total number of units produced</p>
+                    </div>
+
+                    <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Produt Quality Index</h3>
+                        <div class="text-2xl font-bold text-green-800" id="product-quality-index">4.7/5 Stars</div>
+                        <p class="text-sm text-gray-500">Average rating from quality control inspection and customer
+                            feedback</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Work-In-Progress</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="work-in-progress">250 Units</div>
+                        <p class="text-sm text-gray-500">Amount of unfinished goods currently in production</p>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Product SKU::</strong>
+                        <span id="product-sku" class="text-gray-600">P12345</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Product Description:</strong>
+                        <span id="product-description" class="text-gray-600">Awesome Gadget</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Product Line:</strong>
+                        <span id="product-line" class="text-gray-600">Electronics</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Production Start Date:</strong>
+                        <span id="production-start-date" class="text-gray-600">2023-01-15</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Intended Market:</strong>
+                        <span id="intended-market" class="text-gray-600">Young Adults</span>
+                    </div>
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Product Maturity:</strong>
+                        <span id="product-maturity" class="text-gray-600">Growth</span>
+                    </div>
+                    <!--Added elements-->
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Total Revenue (YTD):</strong>
+                        <span id="total-revenue" class="text-gray-600">$500,000</span>
+                    </div>
+
+                    <div class="col-span-full md:col-span-1 lg:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Sales & Marketing Spend:</strong>
+                        <span id="sales-marketing-spend" class="text-gray-600">$50</span>
+                    </div>
+
+                    <div class="col-span-full" id="swot-analysis-div">
+                        <strong class="block font-medium text-gray-700 mb-1">SWOT Analysis Summary:</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Production Monitoring Section -->
+            <div id="production-monitoring" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4">Production Monitoring</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Overall Equipment Effectiveness</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="overall-equipment-effectiveness">$12,500</div>
+                        <p class="text-sm text-gray-500">Combines availability, performance, and quality/p>
+                    </div>
+
+                    <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Production Yield</h3>
+                        <div class="text-2xl font-bold text-green-800" id="production-yield">4.7/5 Stars</div>
+                        <p class="text-sm text-gray-500">Percentage of goods units produced compared to total units
+                            started</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Throughput</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="throughput">250 Units</div>
+                        <p class="text-sm text-gray-500">Number of units produced per hour/day/week</p>
+                    </div>
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Downtime</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="manufacturing-downtime">$12,500</div>
+                        <p class="text-sm text-gray-500">Total time production is stopped due to equipment faliures,
+                            maintenance, or other issues</p>
+                    </div>
+
+                    <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Work-In-Progress (WIP)</h3>
+                        <div class="text-2xl font-bold text-green-800" id="manufacturing-work-in-progress">4.7/5 Stars
+                        </div>
+                        <p class="text-sm text-gray-500">Amount of unfinished goods currently in production</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Schedule Adherence</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="schedule-adherence">250 Units</div>
+                        <p class="text-sm text-gray-500">How well production meets the planned shedule</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">OEE Chart</h3>
+                        <!-- <p id="market-size-display">-</p> -->
+                        <canvas id="oee-chart"></canvas>
+                    </div>
+
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Availability</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="availability">-</div>
+                        <p class="text-sm text-gray-500">Percentage</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Performance</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="performance">-</div>
+                        <p class="text-sm text-gray-500">Percentage</p>
+                    </div>
+
+                    <div class="bg-purple-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Quality</h3>
+                        <div class="text-2xl font-bold text-purple-800" id="quality">-</div>
+                        <p class="text-sm text-gray-500">Percentage</p>
+                    </div>
+
+                    <div class="col-span-full md:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Target OEE:</strong>
+                        <span id="target-oee" class="text-gray-600">-</span>
+                    </div>
+
+                    <div class="col-span-full md:col-span-1">
+                        <strong class="block font-medium text-gray-700 mb-1">Shift:</strong>
+                        <span id="current-shift" class="text-gray-600">-</span>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Quality Control Section -->
+            <div id="quality-control" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4">Quality Control</h2>
+                <div class="overflow-x-auto">
+
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Defet rate</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="defect-rate">$12,500</div>
+                        <p class="text-sm text-gray-500">Percentage of defective units produced</p>
+                    </div>
+
+                    <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">First Pass Yield(FPY)</h3>
+                        <div class="text-2xl font-bold text-green-800" id="first-pass-yield">4.7/5 Stars</div>
+                        <p class="text-sm text-gray-500">Percentage of units that pass quality control on the first
+                            attempt</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Scrap Rate</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="scrap-rate">250 Units</div>
+                        <p class="text-sm text-gray-500">Percentage of units that are discarded</p>
+                    </div>
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Rework Rate</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="rework-rate">$12,500</div>
+                        <p class="text-sm text-gray-500">Percentage of units that require rework</p>
+                    </div>
+
+                    <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Customer Returns</h3>
+                        <div class="text-2xl font-bold text-green-800" id="customer-returns">4.7/5 Stars</div>
+                        <p class="text-sm text-gray-500">Number of products returned by customers due to quality
+                            issues</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Cost of Quality (COQ)</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="cost-of-quality">250 Units</div>
+                        <p class="text-sm text-gray-500">Total cost associated with defects, scrap, rework, and
+                            warranty claims</p>
+                    </div>
+
+                    <table class="min-w-full leading-normal">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Competitor Name
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Market Share
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Customer Segment Name
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Segment Needs
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Segment Growth Potential
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Segment Profitability
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="competitor-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Equipment Performance Section -->
+            <div id="equipment-performance" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4">Equipment Performance</h2>
+                <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Machine Utilization</h3>
+                    <div class="text-2xl font-bold text-blue-800" id="machine-utilization">$12,500</div>
+                    <p class="text-sm text-gray-500">Percentage of time between equipment failures</p>
+                </div>
+
+                <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Mean Time Between Failures(MTBF)</h3>
+                    <div class="text-2xl font-bold text-green-800" id="mean-time-between-failures">4.7/5 Stars</div>
+                    <p class="text-sm text-gray-500">Average time betweeen equipment failures</p>
+                </div>
+
+                <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Mean Time To Repair(MTTR)</h3>
+                    <div class="text-2xl font-bold text-yellow-800" id="mean-time-to-repair">250 Units</div>
+                    <p class="text-sm text-gray-500">Average time required to repair equipment</p>
+                </div>
+                <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Preventive Maintenance Compliance</h3>
+                    <div class="text-2xl font-bold text-blue-800" id="preventive-maintenance-compliance">$12,500
+                    </div>
+                    <p class="text-sm text-gray-500">Adherence to scheduled maintenance tasks/p>
+                </div>
+
+                <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Energy Consumption</h3>
+                    <div class="text-2xl font-bold text-green-800" id="energy-consumption">4.7/5 Stars</div>
+                    <p class="text-sm text-gray-500">Energy used by equipment per unit of production</p>
+                </div>
+
+            </div>
+
+            <!--Inventory Management Section -->
+            <div id="inventory-management" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Inventory Management</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Risk Metrics -->
+                    <div class="bg-red-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Raw Material Inventory</h3>
+                        <div class="text-2xl font-bold text-red-800" id="raw-material-inventory">-</div>
+                        <p class="text-sm text-gray-500">Quality and value of raw metarails on hand</p>
+                    </div>
+
+                    <div class="bg-orange-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Work-In-Progress (WIp)</h3>
+                        <div class="text-2xl font-bold text-orange-800" id="work-in-progress-inventory">-</div>
+                        <p class="text-sm text-gray-500">Amount and value of unfinished goods currently in
+                            production</p>
+                    </div>
+
+                    <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Finished Goods Inventory</h3>
+                        <div class="text-2xl font-bold text-yellow-800" id="finished-goods-inventory">-</div>
+                        <p class="text-sm text-gray-500">Quantity and value of finished products in stock</p>
+                    </div>
+
+                    <div class="bg-purple-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Inventory Turnover</h3>
+                        <div class="text-2xl font-bold text-purple-800" id="inventory-turnover">-</div>
+                        <p class="text-sm text-gray-500">Rate at which inventory is sold and replenished</p>
+                    </div>
+
+                    <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Carrying Costs</h3>
+                        <div class="text-2xl font-bold text-blue-800" id="carrying-costs">-</div>
+                        <p class="text-sm text-gray-500">Costs associated with holding inventory(storage, insurance,
+                            etc.)</p>
+                    </div>
+
+                    <div class="bg-teal-100 rounded-lg p-4 shadow-md">
+                        <h3 class="font-semibold text-gray-600">Stockout Rate</h3>
+                        <div class="text-2xl font-bold text-teal-800" id="stockout-rate">-</div>
+                        <p class="text-sm text-gray-500">Frequency of running out of stock</p>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold mt-6 mb-2 text-gray-700">Risk Mitigation Effectiveness</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                        <h4 class="font-semibold text-gray-600">Overall Effectiveness</h4>
+                        <div class="text-2xl font-bold text-green-800" id="overall-effectiveness">-</div>
+                        <p class="text-sm text-gray-500">Mitigation Success Rate</p>
+                    </div>
+
+                    <div class="bg-indigo-100 rounded-lg p-4 shadow-md">
+                        <h4 class="font-semibold text-gray-600">Risk Impact Reduction</h4>
+                        <div class="text-2xl font-bold text-indigo-800" id="risk-impact-reduction">-</div>
+                        <p class="text-sm text-gray-500">Reduction in Potential Loss</p>
+                    </div>
+                </div>
+
+                <!-- Risk Table -->
+                <h3 class="text-lg font-semibold mt-6 mb-2 text-gray-700">Key Risk Insights and Mitigation Plans
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full leading-normal">
+                        <thead>
+                            <tr>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Risk
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Impact
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Likelihood
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Severity
+                                </th>
+                                <th
+                                    class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    Mitigation Plan
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="risk-table-body">
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!--Maintenance Management Section-->
+            <div id="maintenance-management" class="section dashboard-card hidden">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Operational Efficiency</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Defect Rate -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Preventitive Maintenance Compliance</h3>
+                        <div class="text-3xl font-bold text-red-600" id="preventive-maintenance">-</div>
+                        <p class="text-sm text-gray-500">Adherence to scheduled maintenance tasks. <br> Target:
+                            Below 2%</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-red-400 rounded-full" style="width: 50%"></div>
+                            <!-- Example progress -->
+                        </div>
+                    </div>
+
+                    <!-- Inventory Turnover Rate -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Maintenance Costs </h3>
+                        <div class="text-3xl font-bold text-blue-600" id="maintenance-costs">-</div>
+                        <p class="text-sm text-gray-500">Total maintenance expenses. <br> Target: Above 6</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-blue-400 rounded-full" style="width: 75%"></div>
+                            <!-- Example progress -->
+                        </div>
+                    </div>
+
+                    <!-- Order Fulfillment Rate -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Downtime Due to Maintenance</h3>
+                        <div class="text-3xl font-bold text-green-600" id="downtime-due-to-maintenance">-</div>
+                        <p class="text-sm text-gray-500">Total time production is stopped for maintenance. <br>
+                            Target: Less Than 2 Days</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-green-400 rounded-full" style="width: 90%"></div>
+                            <!-- Example progress -->
+                        </div>
+                    </div>
+
+                    <!-- Product Capacity Utilization -->
+                    <div class="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <h3 class="font-semibold text-gray-600 mb-2">Parts Inventory</h3>
+                        <div class="text-3xl font-bold text-purple-600" id="parts-inventory">-</div>
+                        <p class="text-sm text-gray-500">Availability of spare parts. <br> Target: Above 80%</p>
+                        <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                            <div class="h-2 bg-purple-400 rounded-full" style="width: 60%"></div>
+                            <!-- Example progress -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!--Financial Performance Section-->
+            <div id="financial-performance" class="section dashboard-card">
+                <h3 class="text-lg font-semibold mb-4">Financial Performance</h3>
+                <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Cost of Goods Sold(COGS)</h3>
+                    <div class="text-2xl font-bold text-blue-800" id="cost-of-goods-sold">$12,500</div>
+                    <p class="text-sm text-gray-500">Total cost of producing goods</p>
+                </div>
+
+                <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Gross Profit</h3>
+                    <div class="text-2xl font-bold text-green-800" id="gross-profit">4.7/5 Stars</div>
+                    <p class="text-sm text-gray-500">Revenue minus COGS</p>
+                </div>
+
+                <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Operating Expenses</h3>
+                    <div class="text-2xl font-bold text-yellow-800" id="operating-expenses">250 Units</div>
+                    <p class="text-sm text-gray-500">All manufacturing related expenses(salaries, utilities, etc.)
+                    </p>
+                </div>
+                <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Net Profit</h3>
+                    <div class="text-2xl font-bold text-blue-800" id="net-profit">$12,500</div>
+                    <p class="text-sm text-gray-500">Gross profit minus operating expenses</p>
+                </div>
+
+                <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Return on Assets</h3>
+                    <div class="text-2xl font-bold text-green-800" id="return-on-assets">4.7/5 Stars</div>
+                    <p class="text-sm text-gray-500">Meauser of how effectively assets are used to generate profit
+                    </p>
+                </div>
+
+                <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Cash Flow</h3>
+                    <div class="text-2xl font-bold text-yellow-800" id="cash-flow">250 Units</div>
+                    <p class="text-sm text-gray-500">Inflow and outflow of cash</p>
+                </div>
+
+
+            </div>
+
+            <!--Supply Chain Section-->
+            <div id="supply-chain" class="section dashboard-card hidden">
+                <h3 class="text-lg font-semibold mb-4">Supply Chain</h3>
+                <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Supplier Lead Time</h3>
+                    <div class="text-2xl font-bold text-blue-800" id="supplier-lead-time">$12,500</div>
+                    <p class="text-sm text-gray-500">Time between ordering and receiving raw metarials</p>
+                </div>
+
+                <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">On-Time Delivery</h3>
+                    <div class="text-2xl font-bold text-green-800" id="on-time-delivery">4.7/5 Stars</div>
+                    <p class="text-sm text-gray-500">Percentage of deliveries received on time</p>
+                </div>
+
+                <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Supplier Quality</h3>
+                    <div class="text-2xl font-bold text-yellow-800" id="supplier-quality">250 Units</div>
+                    <p class="text-sm text-gray-500">Quality of raw materials received from suppliers</p>
+                </div>
+                <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Material Costs</h3>
+                    <div class="text-2xl font-bold text-blue-800" id="material-costs">$12,500</div>
+                    <p class="text-sm text-gray-500">Cost of raw materials</p>
+                </div>
+
+                <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Inventory Levels</h3>
+                    <div class="text-2xl font-bold text-green-800" id="inventory-levels">4.7/5 Stars</div>
+                    <p class="text-sm text-gray-500">Raw material inventory levels</p>
+                </div>
+            </div>
+
+            <!--Sustainability Section-->
+            <div id="Sustainability" class="section dashboard-card hidden">
+                <h3 class="text-lg font-semibold mb-4">Sustainability</h3>
+                <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Energy Consumption</h3>
+                    <div class="text-2xl font-bold text-blue-800" id="energy-consumption-manufacturing">$12,500
+                    </div>
+                    <p class="text-sm text-gray-500">Total energy usage</p>
+                </div>
+
+                <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Water Usage</h3>
+                    <div class="text-2xl font-bold text-green-800" id="water-usage-manufacturing">4.7/5 Stars</div>
+                    <p class="text-sm text-gray-500">Total water consumption</p>
+                </div>
+
+                <div class="bg-yellow-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Waste Generation </h3>
+                    <div class="text-2xl font-bold text-yellow-800" id="waste-generation-manufacturing">250 Units
+                    </div>
+                    <p class="text-sm text-gray-500">Amout of waste produced</p>
+                </div>
+                <div class="bg-blue-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Recycling Rate</h3>
+                    <div class="text-2xl font-bold text-blue-800" id="recycling-rate">$12,500</div>
+                    <p class="text-sm text-gray-500">Percentage of waste that is recycled</p>
+                </div>
+
+                <div class="bg-green-100 rounded-lg p-4 shadow-md">
+                    <h3 class="font-semibold text-gray-600">Emissions</h3>
+                    <div class="text-2xl font-bold text-green-800" id="emissions">4.7/5 Stars</div>
+                    <p class="text-sm text-gray-500">Greenhouse gas emissions</p>
+                </div>
+            </div>
+
+    </main>
+</body>
+<script src="{{ url_for('static', filename='js/manufacturing.js') }}"></script>
+
+</html>
