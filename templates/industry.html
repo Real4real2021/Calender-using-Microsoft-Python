@@ -22,20 +22,21 @@
             <select id="industry" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 <option value="" disabled selected>Select an industry</option>
                 <option value="agriculture">Agriculture</option>
-                <option value="mining_energy">Mining & Energy</option>
+                <!-- <option value="mining_energy">Mining & Energy</option>
                 <option value="technology">Technology</option>
-                <option value="transportation">Transportation</option>
-                <option value="healthcare">Healthcare</option>
-                <option value="finance">Finance</option>
-                <option value="education">Education</option>
-                <option value="manufacturing">Manufacturing</option>
-                <option value="retail">Retail</option>
-                <option value="other">Other</option>
+                <option value="transportation">Transportation</option> -->
+                <option value="healthcare">Manufacturing</option>
+                <!-- <option value="finance">Finance</option> -->
+                <!-- <option value="education">Education</option> -->
+                <!-- <option value="manufacturing">Manufacturing</option> -->
+                <!-- <option value="retail">Retail</option> -->
+                <!-- <option value="dashboard">Dashboard</option> -->
+                <!-- <option value="other">Other</option> -->
             </select>
         </div>
 
         <div class="flex items-center justify-between">
-            <a href="{{ url_for('dashboard') }}" id="industry-button">Continue</a>
+            <a href="" id="industry-button">Continue</a>
         </div>
     </form>
 </div>
@@ -46,7 +47,27 @@
         event.preventDefault();
         const selectedIndustry = document.getElementById('industry').value;
         localStorage.setItem('industry', selectedIndustry);
-        window.location.href = "{{ url_for('dashboard') }}"; // Redirect after setting
+        if(selectedIndustry === 'agriculture') {
+            window.location.href = "{{ url_for('agriculture') }}"; 
+        }else if(selectedIndustry === 'mining_energy') {
+            window.location.href = "{{ url_for('mining_energy') }}"; 
+        }else if(selectedIndustry === 'technology' ){
+            window.location.href = "{{ url_for('technology') }}"; 
+        }else if(selectedIndustry === 'transportation'){
+            window.location.href = "{{ url_for('transportation') }}"; 
+        }else if(selectedIndustry === 'healthcare'){
+            window.location.href = "{{ url_for('healthcare') }}"; 
+        }else if(selectedIndustry === 'finance'){
+            window.location.href = "{{ url_for('finance') }}"; 
+        }else if(selectedIndustry === 'education'){
+            window.location.href = "{{ url_for('education') }}"; 
+        }else if(selectedIndustry === 'manufacturing'){
+            window.location.href === "{{ url_for('manufacturing') }}"; 
+        }else if(selectedIndustry === 'retail'){
+            window.location.href = "{{ url_for('retail') }}"; 
+        }else if(selectedIndustry === 'dashboard'){
+            window.location.href = "{{ url_for('dashboard') }}";
+        }
     });
 </script>
 </body>
