@@ -6,13 +6,40 @@ import json
 import openai 
 from openai import OpenAI
 import re 
+import traceback
 
 
 app = Flask(__name__)
 app.secret_key = "no3250239u_093852ongw"
 
 template = """
-You are a helpful AI assistant, skilled at providing business product insight based on user input.
+Conduct a comprehensive analysis of the speadsheet data the user has provided, focusing on production planning, supply chain management, resource management, market analysis, financial performance, risk management, compliance and regulations, and sustainability within the context of manufacturing:
+
+     **Key Requirements:**
+
+    * **Accuracy:** Provide accurate and reliable data from reputable sources.
+    * **Up-to-dateness:** Ensure that all information is current and reflects the latest market conditions.
+    * **Objectivity:** Present unbiased and objective analysis.
+    * **Clarity:** Communicate complex information in a clear and concise manner.
+    * **Data Visualization:** Utilize charts, graphs, and other visual aids to present data effectively.
+    * **Source Citation:** When providing data, cite the source of the information.
+    * **Data driven:** All conclusions must be supported by data.
+    * **No Hallucinations:** When unsure of an answer, state that you do not know, and do not invent information.
+
+    **When presented with a specific query, please follow these steps:**
+
+    1.  **Clarify:** Ask clarifying questions to ensure you understand the specific requirements of the request.
+    2.  **Gather:** Collect relevant data from reliable sources.
+    3.  **Analyze:** Analyze the data and identify key insights.
+    4.  **Summarize:** Summarize the findings in a clear and concise report.
+    5.  **Present:** Present the information in a user-friendly format, including charts and graphs where appropriate.
+    6.  **Cite:** Cite all sources of information.
+
+    By adhering to these guidelines, you will provide valuable market intelligence that supports informed decision-making.
+
+     User Input: "{user_input}"
+
+    Provide actionable advice for improving manufacturing business operations. Provide your analysis as a JSON object. Do not include any markdown formatting. The JSON should be valid and directly parseable by a JSON parser. The structure should be:
 
 Here is the conversation history: {context}
 
@@ -135,7 +162,29 @@ def chat():
 
     # --- Information Extraction ---
     extraction_prompt = """
-    Conduct a business analysis of the following user input, focusing on cost and profit, revenue, break-even analysis, and the interconnectedness of these metrics:
+    Conduct a business analysis on the spreasheet data the user has provided, focusing on cost and profit, revenue, break-even analysis, and the interconnectedness of these metrics:
+
+     **Key Requirements:**
+
+    * **Accuracy:** Provide accurate and reliable data from reputable sources.
+    * **Up-to-dateness:** Ensure that all information is current and reflects the latest market conditions.
+    * **Objectivity:** Present unbiased and objective analysis.
+    * **Clarity:** Communicate complex information in a clear and concise manner.
+    * **Data Visualization:** Utilize charts, graphs, and other visual aids to present data effectively.
+    * **Source Citation:** When providing data, cite the source of the information.
+    * **Data driven:** All conclusions must be supported by data.
+    * **No Hallucinations:** When unsure of an answer, state that you do not know, and do not invent information.
+
+    **When presented with a specific query, please follow these steps:**
+
+    1.  **Clarify:** Ask clarifying questions to ensure you understand the specific requirements of the request.
+    2.  **Gather:** Collect relevant data from reliable sources.
+    3.  **Analyze:** Analyze the data and identify key insights.
+    4.  **Summarize:** Summarize the findings in a clear and concise report.
+    5.  **Present:** Present the information in a user-friendly format, including charts and graphs where appropriate.
+    6.  **Cite:** Cite all sources of information.
+
+    By adhering to these guidelines, you will provide valuable market intelligence that supports informed decision-making.
     
     User Input: "{user_input}"
 
@@ -660,7 +709,7 @@ def chat():
             messages=[
                 {"role": "system", "content": "You are a financial analyst.  Respond to the user's prompt by providing a detailed business analysis in the format of a JSON object.  Do not include any additional text or formatting.  The JSON must be valid."},
                 {"role": "user", 
-                 "content": extraction_prompt
+                 "content": extraction_prompt.format(user_input=user_input)
                  }
             ],
             temperature=0.7, 
@@ -689,6 +738,7 @@ def chat():
             return jsonify({"error": f"Invalid JSON returned from OpenAI: {e}, Raw response: {generated_text}"})
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": f"An error occurred: {e}"})
 
     session["dashboard_params"] = extraction_result
@@ -701,15 +751,31 @@ def agriChat():
 
     # --- Information Extraction ---
     extraction_prompt = """
-    Conduct a comprehensive analysis of the following user input, focusing on crop management, livestock management, resource management, market analysis, financial performance, risk management, compliance and regulations, and sustainability within the context of livestock and crop agriculture:
 
-    User Input: "{user_input}"
+   You are a financial analyst with expertise in the agricultural industry. You will receive data from a user-provided spreadsheet. 
 
-    Provide actionable advice for improving agricultural business operations. Provide your analysis as a JSON object. Do not include any markdown formatting. The JSON should be valid and directly parseable by a JSON parser. The structure should be:
+  User Input: "{user_input}"
 
-    `{
-        "agricultural_analysis": {
-            "product_information": {
+  Perform a detailed analysis of the agricultural data in the spreadsheet, focusing on the following sections using data from the User Input:
+
+  1. Financial Performance:
+    - Calculate total revenue, profit margin, and return on investment.
+    - Identify the most profitable revenue streams based on the spreadsheets.
+    - Provide actionable recommendations to optimize the financial performance of the business, ensuring all recommendations are specific, achievable, and data-driven.
+
+  2. Resource Management:
+    - Summarize all data associated with water usage, fertilizer consumption, and feed consumption.
+    - Provide strategies for improved resource efficiency, highlighting where these can be implemented, the positive impacts that will follow, the difficulty to implement, and the timeframe.
+
+  3. Risk Management:
+    - Analyze identified weather risks and supply chain risks.
+    - Present mitigation strategies for each risk, ensuring all strategies are specific and achievable
+
+  Structure your response as a valid JSON object with the following format:
+
+  `{{
+        "agricultural_analysis": {{
+            "product_information": {{
                 "farm_id": "string (unique identifier, e.g., farm_id-crop_type-year)",
                 "farm_name": "string (e.g., 'Organic Corn', 'Angus Beef')",
                 "farm_category": "string (e.g., 'Crops', 'Livestock')",
@@ -726,18 +792,18 @@ def agriChat():
                 "soil_type": "string",
                 "climate_zone": "string",
                 "irrigation_source": "string"
-            },
-            "swot_analysis": {
+            }},
+            "swot_analysis": {{
                 "strengths": ["list of strengths as strings"],
                 "weaknesses": ["list of weaknesses as strings"],
                 "opportunities": ["list of opportunities as strings"],
                 "threats": ["list of threats as strings"]
-            },
-            "analysis_period": {
+            }},
+            "analysis_period": {{
                 "start_date": "string (YYYY-MM-DD)",
                 "end_date": "string (YYYY-MM-DD)"
-            },
-            "crop_management": {
+            }},
+            "crop_management": {{
                 "crop_type": "string",
                 "planting_practices": "string (e.g., 'No-till', 'Conventional')",
                 "irrigation_methods": "string (e.g., 'Drip', 'Sprinkler')",
@@ -747,167 +813,168 @@ def agriChat():
                 "harvesting_methods": "string (e.g., 'Combine', 'Manual')",
                 "yield_per_acre": "number (bushels/acre or tons/hectare)",
                 "crop_health_index": "number (e.g., 0-10)",
-                "soil_health_assessment": {
+                "soil_health_assessment": {{
                     "organic_matter_percentage": "number",
                     "nutrient_levels": "string (e.g., 'N: High, P: Medium, K: Low')",
                     "pH_level": "number",
                     "compaction_level": "string"
-                    "moisture_level": "string"
-                },
-                "input_costs_per_acre": {
+                    "moisture_level": "number (percentage)"
+                }},
+                "input_costs_per_acre": {{
                     "seed_cost": "number",
                     "fertilizer_cost": "number",
                     "pesticide_cost": "number",
                     "irrigation_cost": "number",
                     "labor_cost": "number"
-                },
+                }},
                 "crop_rotation_plan": "string",
                 "precision_agriculture_usage": "string (e.g., 'GPS guidance', 'Variable rate application')",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "livestock_management": {
+            }},
+            "livestock_management": {{
                 "livestock_breed": "string",
                 "reproduction_rate": "number (e.g., '1-2 offspring per year')",
                 "feed_costs': 'number (e.g., 'Feed per animal')",
                 "feeding_practices": "string (e.g., 'Pasture-raised', 'Feedlot')",
                 "breeding_practices": "string (e.g., 'Artificial insemination', 'Natural mating')",
-                "animal_health_management": {
+                "animal_health_management": {{
                     "health_status": "string",
                     "vaccination_records": "string",
                     "disease_incidence_rate": "number (percentage)",
                     "parasite_control": "string"
                     "weight_gain": "number (kg/day)",
-                },
-                "veterinary_care": {
+                }},
+                "veterinary_care": {{
                     "frequency": "string",
                     "cost_per_animal": "number"
-                },
-                "production_metrics": {
+                }},
+                "production_metrics": {{
                     "milk_yield_per_cow": "number (liters/day)",
                     "average_daily_gain": "number (kg/day)",
                     "feed_conversion_ratio": "number",
                     "mortality_rate": "number (percentage)"
-                },
+                }},
                 "animal_welfare_practices": "string (e.g., 'Space allowance', 'Handling procedures')",
                 "pasture_management": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "resource_management": {
-                "land_use": {
+            }},
+            "resource_management": {{
+                "land_use": {{
                     "crop_acreage": "number",
                     "pasture_acreage": "number",
                     "fallow_acreage": "number",
                     "grazing_land_utilization": "number (percentage of animals per hectare)"
-                },
-                "water_usage": {
+                }},
+                "water_usage": {{
                     "total_water_consumption": "number (liters/year)",
                     "water_source": "string",
                     "water_efficiency_metrics": "number (e.g., liters/kg of product)"
-                },
-                "energy_consumption": {
+                }},
+                "energy_consumption": {{
                     "fuel_consumption": "number (liters/year)",
                     "electricity_consumption": "number (kWh/year)",
                     "renewable_energy_usage": "string"
-                },
-                "feed": {
+                }},
+                "feed": {{
                   "total_feed_consumption": "number (liters/year)",
                   "feed_inventory": "string"(tons),
                   "feed_source": "string",
                   "feed_efficiency_metrics": "number (e.g., liters/kg of product)"
-                }
-                "fertilizer_usage":{
+                }}
+                "fertilizer_usage":{{
                   "total_fertilizer_consumption": "number (liters/year)",
                   "fertilizer_inventory": "string"(tons),
                   "fertilizer_source": "string",
                   "fertilizer_efficiency_metrics": "number (e.g., liters/kg of product)"
-                }
-                "waste_management": {
+                }}
+                "waste_management": {{
                     "manure_management": "string",
                     "crop_residue_management": "string",
                     "recycling_practices": "string",
                     "disposal_costs": "number (e.g., $100/ton)"
-                },
-                "equipment_utilization": {
+                }},
+                "equipment_utilization": {{
                     "equipment_inventory": "string",
                     "equipment_maintenance_records": "string",
                     "equipment_utilization_rate": "number (percentage)"
-                },
-                "input_sourcing": {
+                }},
+                "input_sourcing": {{
                     "supplier_relationships": "string",
                     "input_traceability": "string",
                     "local_sourcing_percentage": "number"
-                },
-                "resource_efficiency_metrics": {
+                }},
+                "resource_efficiency_metrics": {{
                     "resource_use_intensity": "number",
                     "input_output_ratio": "number"
                     "overall_rating": "number" (rating out of 5)
-                },
-                "recommendations": ["list of recommendations as strings"]
-            },
-            "market_analysis": {
+                }},
+                "recommendations": ["list of recommendations as strings"],
+                "total_resource_availability": "number (units)"
+            }},
+            "market_analysis": {{
                 "market_size": "number (total market value or units)",
                 "market_trends": ["list of market trends as strings"],
-                "competitor_analysis": {
+                "competitor_analysis": {{
                     "competitor_name": "string",
                     "market_share": "number (percentage)",
                     "strengths": ["list of strengths as strings"],
                     "weaknesses": ["list of weaknesses as strings"],
                     "pricing_strategy": "string"
-                },
-                "customer_analysis": {
+                }},
+                "customer_analysis": {{
                     "customer_segments": ["list of customer segments as strings"],
                     "pricing_strategies": "string",
                     "distribution_channels": "string",
                     "customer_feedback": "string"
-                },
+                }},
                 "market_price_volatility": "string",
                 "forward_contracting": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "financial_performance": {
-                "production_costs": {
+            }},
+            "financial_performance": {{
+                "production_costs": {{
                     "total_production_costs": "number",
                     "cost_breakdown": "string (e.g., 'Labor: 30%, Inputs: 40%, Overhead: 30%')"
-                },
-                "operating_expenses": {
+                }},
+                "operating_expenses": {{
                     "total_operating_expenses": "number",
                     "expense_breakdown": "string"
-                },
-                "revenue": {
+                }},
+                "revenue": {{
                     "total_revenue": "number",
                     "revenue_streams": "string (e.g., 'Direct sales', 'Wholesale', 'Government subsidies')"
-                },
+                }},
                 "profit_margin": "number (percentage)",
                 "return_on_investment": "number (percentage)",
-                "cash_flow_analysis": {
+                "cash_flow_analysis": {{
                     "cash_flow_statement": "string",
                     "working_capital": "number",
                     "debt_to_equity_ratio": "number"
-                },
+                }},
                 "break_even_point_units": "number",
                 "financial_ratios": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "risk_management": {
-                "weather_risks": {
+            }},
+            "risk_management": {{
+                "weather_risks": {{
                     "drought_risk": "string",
                     "flood_risk": "string",
                     "frost_risk": "string"
-                },
-                "disease_risks": {
+                }},
+                "disease_risks": {{
                     "crop_disease_risk": "string",
                     "livestock_disease_risk": "string"
-                },
-                "market_risks": {
+                }},
+                "market_risks": {{
                     "price_volatility": "string",
                     "input_cost_fluctuations": "string"
-                },
-                "regulatory_risks": {
+                }},
+                "regulatory_risks": {{
                     "environmental_compliance_risk": "string",
                     "food_safety_risk": "string",
                     "labor_law_risk": "string"
-                },
-                "supply_chain_risks":{
+                }},
+                "supply_chain_risks":{{
                     "transportation_and_logistics_risk": "string",
                     "distribution_channel_risk": "string",
                     "supplier_relationships_risk": "string",
@@ -916,93 +983,105 @@ def agriChat():
                     "supplier_security_risk": "string",
                     "supplier_quality_risk": "string",
                     "supplier_trust_risk": "string"
-                },
+                }},
                 "mitigation_strategies": ["list of mitigation strategies as strings"],
-                "insurance_coverage": {
+                "insurance_coverage": {{
                     "crop_insurance": "string",
                     "livestock_insurance": "string",
                     "liability_insurance": "string"
-                },
+                }},
                 "risk_assessment_matrix": "string (e.g., 'Risk: Severity, Probability, Impact')",
                 "contingency_plans": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "compliance_and_regulations": {
-                "environmental_regulations": {
+            }},
+            "compliance_and_regulations": {{
+                "environmental_regulations": {{
                     "water_usage_permits": "string",
                     "emission_standards": "string",
                     "waste_disposal_compliance": "string"
-                },
-                "food_safety_regulations": {
+                }},
+                "food_safety_regulations": {{
                     "traceability_systems": "string",
                     "hygiene_standards": "string",
                     "product_labeling": "string"
-                },
-                "labor_regulations": {
+                }},
+                "labor_regulations": {{
                     "minimum_wage_compliance": "string",
                     "worker_safety_standards": "string",
                     "labor_contracts": "string"
-                },
-                "certification_status": {
+                }},
+                "certification_status": {{
                     "organic_certification": "string",
                     "GAP_certification": "string",
                     "animal_welfare_certification": "string"
-                },
-                "compliance_audits": {
+                }},
+                "compliance_audits": {{
                     "audit_frequency": "string",
                     "audit_findings": "string",
                     "corrective_actions": "string"
-                },
+                }},
                 "regulatory_changes_monitoring": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "sustainability": {
-                "environmental_impact": {
+            }},
+            "sustainability": {{
+                "environmental_impact": {{
                     "soil_carbon_sequestration": "number (tons/acre)",
                     "biodiversity_impact": "string",
                     "biodiversity_index": "number (e.g., 0-100)",
                     "water_footprint": "number (liters/kg)",
                     "greenhouse_gas_emissions": "number (tons CO2e)"
-                },
-                "social_impact": {
+                }},
+                "social_impact": {{
                     "community_engagement": "string",
                     "fair_labor_practices": "string",
                     "local_economic_contribution": "string"
-                },
-                "economic_impact": {
+                }},
+                "economic_impact": {{
                     "long_term_viability": "string",
                     "resource_efficiency": "string",
                     "resilience_to_climate_change": "string"
-                },
-                "sustainable_practices": {
+                }},
+                "sustainable_practices": {{
                     "cover_cropping": "string",
                     "rotational_grazing": "string",
                     "renewable_energy_usage": "string",
                     "reduced_tillage": "string"
-                },
-                "carbon_footprint": {
+                }},
+                "carbon_footprint": {{
                     "scope_1_emissions": "number",
                     "scope_2_emissions": "number",
                     "scope_3_emissions": "number",
                     "carbon_offsetting_practices": "string"
-                },
+                }},
                 "sustainability_reporting": "string (e.g. 'GRI standards', 'Internal reporting')",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "overall_summary": {
+            }},
+            "overall_summary": {{
                 "key_findings": ["list of key findings as strings"],
                 "recommendations": ["list of overall recommendations as strings"],
-                "performance_indicators": {
+                "performance_indicators": {{
                     "economic_indicators": ["list of economic performance indicators"],
                     "environmental_indicators": ["list of environmental performance indicators"],
                     "social_indicators": ["list of social performance indicators"]
-                },
+                }},
                 "strategic_recommendations": ["list of strategic recommendations"],
                 "technology_integration_opportunities": ["list of technology integration opportunities"]
-            }
-        }
-    }`
+            }}
+        }}
+    }}`
+
   
+    **Key Requirements:**
+
+    * **Accuracy:** Provide accurate and reliable data from reputable sources.
+    * **Up-to-dateness:** Ensure that all information is current and reflects the latest market conditions.
+    * **Objectivity:** Present unbiased and objective analysis.
+    * **Clarity:** Communicate complex information in a clear and concise manner.
+    * **Data Visualization:** Utilize charts, graphs, and other visual aids to present data effectively.
+    * **Source Citation:** When providing data, cite the source of the information.
+    * **Data driven:** All conclusions must be supported by data.
+    * **No Hallucinations:** When unsure of an answer, state that you do not know, and do not invent information.
+
     """
     
     try:
@@ -1011,8 +1090,8 @@ def agriChat():
             messages=[
                 {"role": "system", "content": "You are a financial analyst.  Respond to the user's prompt by providing a detailed business analysis in the format of a JSON object.  Do not include any additional text or formatting.  The JSON must be valid."},
                 {"role": "user", 
-                 "content": extraction_prompt
-                 }
+                 "content": extraction_prompt.format(user_input=user_input)
+                }
             ],
             temperature=0.7, 
             # max_tokens=1000      
@@ -1020,6 +1099,7 @@ def agriChat():
 
         if response.choices and response.choices[0].message:
           generated_text = response.choices[0].message.content
+          print(generated_text)
 
           generated_text = generated_text.replace('\n', '') # Remove newlines
           generated_text = generated_text.strip('`').strip() 
@@ -1034,12 +1114,13 @@ def agriChat():
           raise ValueError("Unexpected response format from OpenAI API.")
 
         try:
-            print(repr(response.choices[0].message.content))
+            # print(repr(response.choices[0].message.content))
             extraction_result = json.loads(generated_text)
         except json.JSONDecodeError as e:
             return jsonify({"error": f"Invalid JSON returned from OpenAI: {e}, Raw response: {generated_text}"})
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": f"An error occurred: {e}"})
 
     session["dashboard_params"] = extraction_result
@@ -1052,15 +1133,28 @@ def manufacturingChat():
 
         # --- Information Extraction ---
     extraction_prompt = """
-    Conduct a comprehensive analysis of the following user input, focusing on production planning, supply chain management, resource management, market analysis, financial performance, risk management, compliance and regulations, and sustainability within the context of manufacturing:
-
+    You are a financial analyst with expertise in the agricultural industry. You will receive data from a user-provided spreadsheet. 
+  
     User Input: "{user_input}"
+    
+    Conduct a comprehensive analysis of the speadsheet data the user has provided, focusing on production planning, supply chain management, resource management, market analysis, financial performance, risk management, compliance and regulations, and sustainability within the context of manufacturing:
 
-    Provide actionable advice for improving manufacturing business operations. Provide your analysis as a JSON object. Do not include any markdown formatting. The JSON should be valid and directly parseable by a JSON parser. The structure should be:
+    **Key Requirements:**
 
-    `{
-        "manufacturing_analysis": {
-            "product_information": {
+    * **Accuracy:** Provide accurate and reliable data from reputable sources.
+    * **Up-to-dateness:** Ensure that all information is current and reflects the latest market conditions.
+    * **Objectivity:** Present unbiased and objective analysis.
+    * **Clarity:** Communicate complex information in a clear and concise manner.
+    * **Data Visualization:** Utilize charts, graphs, and other visual aids to present data effectively.
+    * **Source Citation:** When providing data, cite the source of the information.
+    * **Data driven:** All conclusions must be supported by data.
+    * **No Hallucinations:** When unsure of an answer, state that you do not know, and do not invent information.
+
+    Provide actionable advice for improving agricultural business operations. Provide your analysis as a JSON object. The structure should be:
+
+    `{{
+        "manufacturing_analysis": {{
+            "product_information": {{
                 "product_sku": "string (unique identifier, e.g., product_sku-product_type-year)",
                 "factory_id": "string (unique identifier, e.g., factory_id-product_type-year)",
                 "production_output": "number (total number of units produced)",
@@ -1080,29 +1174,29 @@ def manufacturingChat():
                 "production_line_setup": "string (e.g., 'Assembly line', 'Batch processing')",
                 "automation_level": "string (e.g., 'Fully automated', 'Semi-automated', 'Manual')",
                 "raw_material_sources": "string"
-            },
-            "swot_analysis": {
+            }},
+            "swot_analysis": {{
                 "strengths": ["list of strengths as strings"],
                 "weaknesses": ["list of weaknesses as strings"],
                 "opportunities": ["list of opportunities as strings"],
                 "threats": ["list of threats as strings"]
-            },
-            "analysis_period": {
+            }},
+            "analysis_period": {{
                 "start_date": "string (YYYY-MM-DD)",
                 "end_date": "string (YYYY-MM-DD)"
-            },
-            "production_planning": {
+            }},
+            "production_planning": {{
                 "production_capacity": "number (units per month or year)",
                 "capacity_utilization_rate": "number (percentage)",
                 "machine_utilization_rate": "number (percentage)",
-                "inventory_levels": {
+                "inventory_levels": {{
                     "raw_materials": "number (units)",
                     "work_in_progress": "number (units)",
                     "finished_goods": "number (units)",
                     "turnover_rate": "number (percentage)"
                     "stockout_rate": "number (percentage)"
                     "parts_inventory": "number (units)"
-                },
+                }},
                 "demand_forecasting_accuracy": "number (percentage)",
                 "production_scheduling_methods": "string (e.g., 'Just-in-Time', 'MRP')",
                 "lead_time": "number (days)",
@@ -1113,115 +1207,115 @@ def manufacturingChat():
                 "throughput": "number (units/hour)",
                 "bottleneck_analysis": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "supply_chain_management": {
+            }},
+            "supply_chain_management": {{
                 "supplier_network": "string",
-                "supplier_performance": {
+                "supplier_performance": {{
                     "supplier_name": "string",
                     "on_time_delivery_rate": "number (percentage)",
                     "quality_rating": "number (e.g., 0-10)",
                     "pricing_competitiveness": "string"
-                },
-                "logistics_and_transportation": {
+                }},
+                "logistics_and_transportation": {{
                     "transportation_modes": "string (e.g., 'Truck', 'Rail', 'Air')",
                     "carrying_costs": "number",
                     "transportation_costs": "number",
                     "delivery_time": "number (days)"
-                },
+                }},
                 "inventory_management_practices": "string (e.g., 'FIFO', 'LIFO')",
                 "warehousing_practices": "string",
                 "supply_chain_visibility": "string",
                 "supply_chain_risk_assessment": "string",
                 "supplier_relationships": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "resource_management": {
-                "raw_material_usage": {
+            }},
+            "resource_management": {{
+                "raw_material_usage": {{
                     "total_consumption": "number (units)",
                     "material_sourcing": "string",
                     "material_waste": "number (percentage)",
                     "material_costs": "number",
                     "material_availability": "string"
-                },
-                "energy_consumption": {
+                }},
+                "energy_consumption": {{
                     "total_energy_consumption": "number (kWh/year)",
                     "energy_sources": "string",
                     "energy_efficiency_measures": "string",
                     "energy_costs": "number"
-                },
-                "water_usage": {
+                }},
+                "water_usage": {{
                     "total_water_consumption": "number (liters/year)",
                     "water_sources": "string",
                     "water_treatment_practices": "string",
                     "water_costs": "number"
-                },
-                "waste_management": {
+                }},
+                "waste_management": {{
                     "waste_generation": "number (tons/year)",
                     "waste_disposal_methods": "string",
                     "recycling_rate": "number (percentage)",
                     "waste_disposal_costs": "number"
-                },
-                "equipment_maintenance": {
+                }},
+                "equipment_maintenance": {{
                     "maintenance_schedule": "string",
                     "schedule_adherence": "number (percentage)",
                     "maintenance_costs": "number",
                     "equipment_failure_rate": "number (percentage)"
                     "downtime_due_to_maintenance": "number (hours)" 
                     "mean_time_to_repair" : "number (hours)"
-                },
-                "labor_management": {
+                }},
+                "labor_management": {{
                     "labor_costs": "number",
                     "labor_productivity": "number (units/hour)",
                     "employee_turnover_rate": "number (percentage)",
                     "employee_training": "string"
-                },
-                "resource_efficiency_metrics": {
+                }},
+                "resource_efficiency_metrics": {{
                     "resource_use_intensity": "number",
                     "input_output_ratio": "number",
                     "overall_rating": "number"
-                },
+                }},
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "market_analysis": {
+            }},
+            "market_analysis": {{
                 "market_size": "number (total market value or units)",
                 "market_trends": ["list of market trends as strings"],
-                "competitor_analysis": {
+                "competitor_analysis": {{
                     "competitor_name": "string",
                     "market_share": "number (percentage)",
                     "strengths": ["list of strengths as strings"],
                     "weaknesses": ["list of weaknesses as strings"],
                     "pricing_strategy": "string"
-                },
-                "customer_analysis": {
+                }},
+                "customer_analysis": {{
                     "customer_segments": ["list of customer segments as strings"],
                     "pricing_strategies": "string",
                     "distribution_channels": "string",
                     "customer_feedback": "string"
-                },
+                }},
                 "market_price_volatility": "string",
                 "demand_elasticity": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "financial_performance": {
-                "production_costs": {
+            }},
+            "financial_performance": {{
+                "production_costs": {{
                     "total_production_costs": "number",
                     "cost_breakdown": "string (e.g., 'Labor: 30%, Materials: 40%, Overhead: 30%')"
-                },
-                "operating_expenses": {
+                }},
+                "operating_expenses": {{
                     "total_operating_expenses": "number",
                     "expense_breakdown": "string"
-                },
-                "revenue": {
+                }},
+                "revenue": {{
                     "total_revenue": "number",
                     "revenue_streams": "string (e.g., 'Direct sales', 'Wholesale', 'Government contracts')"
-                },
+                }},
                 "profit_margin": "number (percentage)",
                 "return_on_investment": "number (percentage)",
-                "cash_flow_analysis": {
+                "cash_flow_analysis": {{
                     "cash_flow_statement": "string",
                     "working_capital": "number",
                     "debt_to_equity_ratio": "number"
-                },
+                }},
                 "break_even_point_units": "number",
                 "cost_of_goods_sold": "number",
                 "marketing_spend": "number",
@@ -1230,29 +1324,29 @@ def manufacturingChat():
                 "return_on_assests": "number",
                 "financial_ratios": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "risk_management": {
-                "operational_risks": {
+            }},
+            "risk_management": {{
+                "operational_risks": {{
                     "equipment_failure_risk": "string",
                     "supply_chain_disruption_risk": "string",
                     "quality_control_risk": "string"
-                },
-                "market_risks": {
+                }},
+                "market_risks": {{
                     "demand_fluctuation_risk": "string",
                     "pricing_pressure_risk": "string",
                     "competition_risk": "string"
-                },
-                "financial_risks": {
+                }},
+                "financial_risks": {{
                     "currency_exchange_rate_risk": "string",
                     "interest_rate_risk": "string",
                     "credit_risk": "string"
-                },
-                "regulatory_risks": {
+                }},
+                "regulatory_risks": {{
                     "environmental_compliance_risk": "string",
                     "product_safety_risk": "string",
                     "labor_law_risk": "string"
-                },
-                 "supply_chain_risks":{
+                }},
+                 "supply_chain_risks": {{
                     "transportation_and_logistics_risk": "string",
                     "distribution_channel_risk": "string",
                     "supplier_relationships_risk": "string",
@@ -1261,80 +1355,80 @@ def manufacturingChat():
                     "supplier_security_risk": "string",
                     "supplier_quality_risk": "string",
                     "supplier_trust_risk": "string"
-                },
+                }},
                 "mitigation_strategies": ["list of mitigation strategies as strings"],
-                "insurance_coverage": {
+                "insurance_coverage": {{
                     "property_insurance": "string",
                     "liability_insurance": "string",
                     "business_interruption_insurance": "string"
-                },
+                }},
                 "risk_assessment_matrix": "string (e.g., 'Risk: Severity, Probability, Impact')",
                 "contingency_plans": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "compliance_and_regulations": {
-                "environmental_regulations": {
+            }},
+            "compliance_and_regulations": {{
+                "environmental_regulations": {{
                     "emission_standards": "string",
                     "waste_disposal_compliance": "string",
                     "hazardous_materials_handling": "string"
-                },
-                "product_safety_regulations": {
+                }},
+                "product_safety_regulations": {{
                     "product_testing": "string",
                     "labeling_requirements": "string",
                     "recall_procedures": "string"
-                },
-                "labor_regulations": {
+                }},
+                "labor_regulations": {{
                     "minimum_wage_compliance": "string",
                     "worker_safety_standards": "string",
                     "labor_contracts": "string"
-                },
-                "certification_status": {
+                }},
+                "certification_status": {{
                     "ISO_certification": "string",
                     "quality_management_certification": "string",
                     "environmental_management_certification": "string"
-                },
-                "compliance_audits": {
+                }},
+                "compliance_audits": {{
                     "audit_frequency": "string",
                     "audit_findings": "string",
                     "corrective_actions": "string"
-                },
+                }},
                 "regulatory_changes_monitoring": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "sustainability": {
-                "environmental_impact": {
+            }},
+            "sustainability": {{
+                "environmental_impact": {{
                     "carbon_footprint": "number (tons CO2e)",
                     "water_footprint": "number (liters/unit)",
                     "waste_generation": "number (tons/year)",
                     "resource_depletion": "string"
-                },
-                "social_impact": {
+                }},
+                "social_impact": {{
                     "community_engagement": "string",
                     "fair_labor_practices": "string",
                     "employee_wellbeing": "string"
-                },
-                "economic_impact": {
+                }},
+                "economic_impact": {{
                     "long_term_viability": "string",
                     "job_creation": "string",
                     "local_economic_contribution": "string"
-                },
-                "sustainable_practices": {
+                }},
+                "sustainable_practices": {{
                     "energy_efficiency_improvements": "string",
                     "energy_consumption": "string",
                     "waste_reduction_strategies": "string",
                     "renewable_energy_usage": "string",
                     "sustainable_sourcing": "string"
-                },
-                 "carbon_footprint": {
+                }},
+                 "carbon_footprint": {{
                     "scope_1_emissions": "number",
                     "scope_2_emissions": "number",
                     "scope_3_emissions": "number",
                     "carbon_offsetting_practices": "string"
-                },
+                }},
                 "sustainability_reporting": "string (e.g. 'GRI standards', 'Internal reporting')",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "quality_control":{
+            }},
+            "quality_control":{{
                 "defect_rate": "number",
                 "first_pass_yield": "number",
                 "scrap_rate": "number",
@@ -1346,8 +1440,8 @@ def manufacturingChat():
                 "quality_control_metrics": "number",
                 "quality_assurance_programs": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "automation_and_technology":{
+            }},
+            "automation_and_technology":{{
                 "automation_level": "string (e.g., 'Fully automated', 'Semi-automated', 'Manual')",
                 "technology_used": "string",
                 "integration_of_AI": "string",
@@ -1356,31 +1450,32 @@ def manufacturingChat():
                 "robotics": "string",
                 "predictive_maintenance": "string",
                 "recommendations": ["list of recommendations as strings"]
-            },
-            "overall_summary": {
+            }},
+            "overall_summary": {{
                 "key_findings": ["list of key findings as strings"],
                 "recommendations": ["list of overall recommendations as strings"],
-                "performance_indicators": {
+                "performance_indicators": {{
                     "economic_indicators": ["list of economic performance indicators"],
                     "environmental_indicators": ["list of environmental performance indicators",
                     "social_indicators": ["list of social performance indicators"
-                },
+                }},
                 "strategic_recommendations": ["list of strategic recommendations"],
                 "technology_integration_opportunities": ["list of technology integration opportunities"]
-            }
-        }
-    }`
+            }}
+        }}
+    }}`
 
     """
-
+  
     try:
+        print("Extraction Prompt:\n", extraction_prompt)
         response = client.chat.completions.create(
             model="gpt-4o-mini",  
             messages=[
                 {"role": "system", "content": "You are a financial analyst.  Respond to the user's prompt by providing a detailed business analysis in the format of a JSON object.  Do not include any additional text or formatting.  The JSON must be valid."},
                 {"role": "user", 
-                 "content": extraction_prompt
-                 }
+                 "content": extraction_prompt.format(user_input=user_input)
+                }
             ],
             temperature=0.7, 
             # max_tokens=1000      
@@ -1402,12 +1497,13 @@ def manufacturingChat():
           raise ValueError("Unexpected response format from OpenAI API.")
 
         try:
-            print(repr(response.choices[0].message.content))
+            # print(repr(response.choices[0].message.content))
             extraction_result = json.loads(generated_text)
         except json.JSONDecodeError as e:
             return jsonify({"error": f"Invalid JSON returned from OpenAI: {e}, Raw response: {generated_text}"})
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": f"An error occurred: {e}"})
 
     session["dashboard_params"] = extraction_result
