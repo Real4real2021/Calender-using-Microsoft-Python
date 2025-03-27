@@ -1,7 +1,28 @@
 const manufacturingButton =  document.getElementById("manufacturing-button");
 const dataInputSection = document.getElementById("data-input-section");
 const resultsContainer = document.getElementById("results-container");
+//OEE Section
+const oeeCanvas = document.getElementById('oee-chart').getContext('2d');
+const oeeValue = document.getElementById('oee');
+const availabilityValue = document.getElementById('availability');
+const performanceValue = document.getElementById('performance');
+const qualityValue = document.getElementById('quality');
+const targetOeeValue = document.getElementById('target-oee');
+const currentShiftValue = document.getElementById('current-shift');
+
 let manufacturingData = null;
+
+const productionData = {
+  oee: 75, // Overall Equipment Effectiveness (percentage)
+  availability: 80, // Availability (percentage)
+  performance: 90, // Performance (percentage)
+  quality: 95, // Quality (percentage)
+  targetOee: 85,
+  currentShift: 'Day Shift',
+  oeeTrend: [70, 72, 75, 78, 80, 75],  // Sample trend data
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'] //Time labels
+};
+
 manufacturingButton.addEventListener('click', async function () {
     const file = document.getElementById('spreadsheet-upload').files[0];
     const spinner = document.getElementById('loading-spinner');
@@ -21,12 +42,14 @@ manufacturingButton.addEventListener('click', async function () {
 
         const firstSheet = workbook.SheetNames[0];
         processManufacturingSheet(workbook.Sheets[firstSheet]);
+        createOEEChart(productionData)
     };
     reader.readAsBinaryString(file);
 })
 
 async function processManufacturingSheet(sheetData) {
     const jsonData = XLSX.utils.sheet_to_json(sheetData);
+    const csvData = XLSX.utils.sheet_to_csv(sheetData);
 
     try {
       const response = await fetch("/manufacturingChat", {
@@ -34,7 +57,7 @@ async function processManufacturingSheet(sheetData) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: jsonData }),
+        body: JSON.stringify({ message: csvData }),
       });
 
       const result = await response.json();
@@ -183,18 +206,18 @@ const recyclingRate = document.getElementById('recycling-rate')
 const emissions = document.getElementById('emissions')
 
 function plantOverview(data){
-    productionOutput.innerHTML = data.manufacturing_analysis.product_information.production_output
-    productQualityIndex.innerHTML = data.manufacturing_analysis.product_information.product_quality_index
-    workInProgresss.innerHTML = data.manufacturing_analysis.production_planning.inventory_levels.work_in_progress
-    productSkeleton.innerHTML = data.manufacturing_analysis.product_information.product_sku
-    productDescription.innerHTML = data.manufacturing_analysis.product_information.product_type
-    productLine.innerHTML = data.manufacturing_analysis.product_information.factory_description
-    productionStartDate.innerHTML = data.manufacturing_analysis.product_information.manufacturing_start_date
-    intendedMarket.innerHTML = data.manufacturing_analysis.product_information.target_market
-    productMaturity.innerHTML = data.manufacturing_analysis.product_information.manufacturing_cycle_stage
-    totalRevenue.innerHTML = data.manufacturing_analysis.financial_performance.revenue.total_revenue
-    salesMarketingSpend.innerHTML = data.manufacturing_analysis.financial_performance.marketing_spend
-    swotAnalysis.innerHTML = data.manufacturing_analysis.swot_analysis
+    productionOutput.innerHTML = `${data.manufacturing_analysis.product_information.production_output}units`
+    productQualityIndex.innerHTML = `${data.manufacturing_analysis.product_information.product_quality_index}%`
+    workInProgresss.innerHTML = `${data.manufacturing_analysis.production_planning.inventory_levels.work_in_progress}`
+    productSkeleton.innerHTML = `${data.manufacturing_analysis.product_information.product_sku}`
+    productDescription.innerHTML = `${data.manufacturing_analysis.product_information.product_type}`
+    productLine.innerHTML = `${data.manufacturing_analysis.product_information.factory_description}`
+    productionStartDate.innerHTML = `${data.manufacturing_analysis.product_information.manufacturing_start_date}`
+    intendedMarket.innerHTML = `${data.manufacturing_analysis.product_information.target_market}`
+    productMaturity.innerHTML = `${data.manufacturing_analysis.product_information.manufacturing_cycle_stage}`
+    totalRevenue.innerHTML = `${data.manufacturing_analysis.financial_performance.revenue.total_revenue}`
+    salesMarketingSpend.innerHTML = `${data.manufacturing_analysis.financial_performance.marketing_spend}`
+    swotAnalysis.innerHTML = `${data.manufacturing_analysis.swot_analysis}`
 }
 
 function productionMonitoring(data){
@@ -265,3 +288,37 @@ function sustainability(data){
     // emissions.innerHTML = `${data.manufacturing_analysis.sustainability.carbon_footprint.scope_1_emissions} || ${data.manufacturing_analysis.sustainability.carbon_footprint.scope_2_emissions} || ${data.manufacturing_analysis.sustainability.carbon_footprint.scope_3_emissions}`
 }
 
+function createOEEChart(oeeData) {
+  new Chart(oeeCanvas, {
+      type: 'line', 
+      data: {
+          labels: oeeData.labels,
+          datasets: [{
+              label: 'OEE',
+              data: oeeData.oeeTrend,
+              fill: false,
+              borderColor: 'rgb(75, 192, 192)',
+              tension: 0.1
+          }]
+      },
+      type: 'line', 
+      data: {
+          labels: oeeData.labels,
+          datasets: [{
+              label: 'Other OEE',
+              data: oeeData.oeeTrend,
+              fill: false,
+              borderColor: 'rgb(255, 25, 17)',
+              tension: 0.1
+          }]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  max: 100  // Assuming OEE is a percentage
+              }
+          }
+      }
+  });
+}
