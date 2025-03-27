@@ -9,14 +9,14 @@ let currentAgriData = null;
 
 async function processAgriSheet(sheetData) {
     const jsonData = XLSX.utils.sheet_to_json(sheetData);
-
+    const csvData = XLSX.utils.sheet_to_csv(sheetData);
     try {
       const response = await fetch("/agricultureChat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: jsonData }),
+        body: JSON.stringify({ message: csvData }),
       });
 
       const result = await response.json();
@@ -85,7 +85,7 @@ async function processAgriSheet(sheetData) {
   const feedInventory = document.getElementById("feed-inventory");
   const wasteManagement = document.getElementById("waste-management");
   const wasteDisposalCost = document.getElementById("waste-disposal-cost");
-  const renewableEnergyUsage = document.getElementById("renewable-energy-usage");
+  const renewableEnergyUsage = document.getElementById("renewable-energy-generation");
 
   const grossRevenue = document.getElementById("gross-revenue");
   const operatingExpenses = document.getElementById("operating-expenses");
@@ -93,20 +93,20 @@ async function processAgriSheet(sheetData) {
   const returnOnInvestment = document.getElementById("return-on-investment");
   const cashFlow = document.getElementById("cash-flow");
   const debtToEquityRatio = document.getElementById("debt-to-equity-ratio");
-  const breakEvenPointUnits = document.getElementById("break-even-point-units");
+  const breakEvenPointUnits = document.getElementById("break-even-point");
 
   const weatherRIskindex = document.getElementById("weather-risk-index");
-  const pestDiseaseRiskindex = document.getElementById("pest-disease-risk-index");
-  const marketVolatilityRiskindex = document.getElementById("market-volatility-risk-index");
-  const regulatoryRiskindex = document.getElementById("regulatory-risk-index");
-  const supplyChainRiskindex = document.getElementById("supply-chain-risk-index");
-  const biosecurityRiskindex = document.getElementById("biosecurity-risk-index");
+  const pestDiseaseRiskindex = document.getElementById("pest-disease-risk");
+  const marketVolatilityRiskindex = document.getElementById("market-volatility-risk");
+  const regulatoryRiskindex = document.getElementById("regulatory-risk");
+  const supplyChainRiskindex = document.getElementById("supply-chain-risk");
+  const biosecurityRiskindex = document.getElementById("biosecurity-risk");
   const riskTableBody = document.getElementById("risk-table-body");
 
   function farmOverview(data){
     totalRevenueGenerated.innerHTML = data.agricultural_analysis.financial_performance.revenue.total_revenue
     productionEfficiency.innerHTML = data.agricultural_analysis.resource_management.resource_efficiency_metrics.overall_rating
-    // resourceAvailability.innerHTML = data.agricultural_analysis.
+    resourceAvailability.innerHTML = data.agricultural_analysis.resource_management.total_resource_availability
     farmID.innerHTML= data.agricultural_analysis.product_information.farm_id;
     farmName.innerHTML= data.agricultural_analysis.product_information.farm_name
     farmType.innerHTML= data.agricultural_analysis.product_information.farm_category
