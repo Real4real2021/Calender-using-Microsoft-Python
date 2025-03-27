@@ -24,7 +24,7 @@ async function processAgriSheet(sheetData) {
       if (result && result.message) {
         currentAgriData = result.message;
         resultsContainer.classList.remove("hidden");
-        updateAgriDashboard(currentAgriData);
+        updateAgriDashboard(currentAgriData);``
       } else {
         alert("Failed to retrieve data or invalid data format.");
       }
@@ -103,6 +103,18 @@ async function processAgriSheet(sheetData) {
   const biosecurityRiskindex = document.getElementById("biosecurity-risk");
   const riskTableBody = document.getElementById("risk-table-body");
 
+  const environmentalCompliance = document.getElementById("environmental-compliance");
+  const foodSafetyCompliance = document.getElementById("food-safety-compliance");
+  const animalWelfareCompliance = document.getElementById("animal-welfare-compliance");
+  const laborLawCompliance = document.getElementById("labor-law-compliance");
+  const complianceTableBody = document.getElementById("compliance-table-body");
+
+  const carbonFootprint = document.getElementById("carbon-footprint");
+  const waterFootprint = document.getElementById("water-footprint");
+  const soilHealthIndex = document.getElementById("soil-health-index");
+  const biodiversityIndex = document.getElementById("biodiversity-index");
+  const sustainablePractices = document.getElementById("sustainable-practices-list");
+
   function farmOverview(data){
     totalRevenueGenerated.innerHTML = data.agricultural_analysis.financial_performance.revenue.total_revenue
     productionEfficiency.innerHTML = data.agricultural_analysis.resource_management.resource_efficiency_metrics.overall_rating
@@ -131,12 +143,12 @@ async function processAgriSheet(sheetData) {
   function liveStockManagement(data){
     animalHealthStatus.innerHTML =  data.agricultural_analysis.livestock_management.animal_health_management.health_status
     weightGain.innerHTML =  data.agricultural_analysis.livestock_management.animal_health_management.weight_gain
-    feedConversionRatio.innerHTML =  data.agricultural_analysis.livestock_management.production_metrics.feed_conversion_ration
+    feedConversionRatio.innerHTML =  data.agricultural_analysis.livestock_management.production_metrics.feed_conversion_ratio
     mortalityRate.innerHTML =  data.agricultural_analysis.livestock_management.production_metrics.mortality_rate
     reproductionRate.innerHTML =  data.agricultural_analysis.livestock_management.production_metrics.reproduction_rate
-    milkProduction.innerHTML =  data.agricultural_analysis.livestock_management.production_metrics.mild_yield_per_cow
+    milkProduction.innerHTML =  data.agricultural_analysis.livestock_management.production_metrics.milk_yield_per_cow
     // eggProduction.innerHTML =  data.agricultural_analysis.
-    // grazingLandUtilization.innerHTML =  data.agricultural_analysis.
+    grazingLandUtilization.innerHTML =  data.agricultural_analysis.resource_management.land_use.grazing_land_utilization
     // feedCosts.innerHTML =  data.agricultural_analysis.
     // waterConsumption.innerHTML =  data.agricultural_analysis.
   }
@@ -147,10 +159,10 @@ async function processAgriSheet(sheetData) {
     energyConsumption.innerHTML = data.agricultural_analysis.resource_management.energy_consumption.electricity_consumption 
     fuelConsumption.innerHTML = data.agricultural_analysis.resource_management.energy_consumption.fuel_consumption
     fertilizerInventory.innerHTML = data.agricultural_analysis.resource_management.fertilizer_usage.fertilizer_inventory
-    feedInventory.innerHTML = data.agricultural_analysis.resource_management.feed.fee_inventory
-    wasteManagement.innerHTML = data.agricultural_analysis.resource_management.waste_management.crop_residue_management
+    feedInventory.innerHTML = data.agricultural_analysis.resource_management.feed.feed_inventory
+    wasteManagement.innerHTML = data.agricultural_analysis.resource_management.waste_management.total_waste
     wasteDisposalCost.innerHTML = data.agricultural_analysis.resource_management.waste_management.disposal_costs
-    renewableEnergyUsage.innerHTML = data.agricultural_analysis.resource_management.energy_consumption.renewable_energy_usage
+    renewableEnergyUsage.innerHTML = data.agricultural_analysis.resource_management.energy_consumption.renewable_energy_generation
   }
 
   function financialPerformance(data){
@@ -164,15 +176,36 @@ async function processAgriSheet(sheetData) {
   }
 
   function riskManagement(data){
-    weatherRIskindex.innerHTML = data.agricultural_analysis.risk_management.weather_risks
+    weatherRIskindex.innerHTML = `${data.agricultural_analysis.risk_management.weather_risks.drought_risk} || ${data.agricultural_analysis.risk_management.weather_risks.flood_risk} || ${data.agricultural_analysis.risk_management.weather_risks.frost_risk}`
     pestDiseaseRiskindex.innerHTML = data.agricultural_analysis.risk_management.disease_risks.crop_disease_risk
     marketVolatilityRiskindex.innerHTML = data.agricultural_analysis.risk_management.market_risks.input_cost_fluctuations
-    regulatoryRiskindex.innerHTML = data.agricultural_analysis.risk_management.regulatory_risks
-    supplyChainRiskindex.innerHTML = data.agricultural_analysis.risk_management.supply_chain_risks
+    regulatoryRiskindex.innerHTML = `${data.agricultural_analysis.risk_management.regulatory_risks.environmental_compliance_risk} || ${data.agricultural_analysis.risk_management.regulatory_risks.food_safety_risk} || ${data.agricultural_analysis.risk_management.regulatory_risks.labor_law_risk}`
+    supplyChainRiskindex.innerHTML = `${data.agricultural_analysis.risk_management.supply_chain_risks.transportation_and_logistics_risk} || ${data.agricultural_analysis.risk_management.supply_chain_risks.distribution_channel_risk} || ${data.agricultural_analysis.risk_management.supply_chain_risks.supplier_relationships_risk} || ${data.agricultural_analysis.risk_management.supply_chain_risks.input_traceability_risk} || ${data.agricultural_analysis.risk_management.supply_chain_risks.local_sourcing_risk} || ${data.agricultural_analysis.risk_management.supply_chain_risks.supplier_security_risk} || ${data.agricultural_analysis.risk_management.supply_chain_risks.supplier_quality_risk} || ${data.agricultural_analysis.risk_management.supply_chain_risks.supplier_trust_risk}`
     // biosecurityRiskindex.innerHTML = data.agricultural_analysis
     // riskTableBody.innerHTML = data.agricultural_analysis
   }
 
+  function complianceRegulations(data){
+    environmentalCompliance.innerHTML = `${data.agricultural_analysis.compliance_and_regulations.environmental_regulations.water_usage_permits} || ${data.agricultural_analysis.compliance_and_regulations.environmental_regulations.emission_standards} || ${data.agricultural_analysis.compliance_and_regulations.environmental_regulations.waste_disposal_compliance}`
+    foodSafetyCompliance.innerHTML = `${data.agricultural_analysis.compliance_and_regulations.food_safety_regulations.hygiene_standards} || ${data.agricultural_analysis.compliance_and_regulations.food_safety_regulations.product_labeling}`
+    animalWelfareCompliance.innerHTML = `${data.agricultural_analysis.compliance_and_regulations.animal_welfare_compliance.animal_welfare_certification} || ${data.agricultural_analysis.compliance_and_regulations.animal_welfare_compliance.GAP_certification} || ${data.agricultural_analysis.compliance_and_regulations.animal_welfare_compliance.animal_welfare_standards}`
+    laborLawCompliance.innerHTML = `${data.agricultural_analysis.compliance_and_regulations.labor_regulations.minimum_wage_compliance} || ${data.agricultural_analysis.compliance_and_regulations.labor_regulations.worker_safety_standards} || ${data.agricultural_analysis.compliance_and_regulations.labor_regulations.labor_contracts}`
+    // complianceTableBody.innerHTML = data.agricultural_analysis
+  }
+
+  function sustainability(data){
+    carbonFootprint.innerHTML = `${data.agricultural_analysis.sustainability.carbon_footprint.scope_1_emissions} || ${data.agricultural_analysis.sustainability.carbon_footprint.scope_2_emissions} || ${data.agricultural_analysis.sustainability.carbon_footprint.scope_3_emissions}`
+    waterFootprint.innerHTML = `${data.agricultural_analysis.sustainability.environmental_impact.water_footprint} liters/kg`
+    soilHealthIndex.innerHTML = `${data.agricultural_analysis.crop_management.soil_health_assessment.organic_matter_percentage} || ${data.agricultural_analysis.crop_management.soil_health_assessment.nutrient_levels} || ${data.agricultural_analysis.crop_management.soil_health_assessment.pH_level} || ${data.agricultural_analysis.crop_management.soil_health_assessment.compaction_level} || ${data.agricultural_analysis.crop_management.soil_health_assessment.moisture_level}`
+    biodiversityIndex.innerHTML = `${data.agricultural_analysis.sustainability.environmental_impact.biodiversity_index}`
+    sustainablePractices.innerHTML = `${data.agricultural_analysis.sustainability.sustainable_practices.cover_cropping} || ${data.agricultural_analysis.sustainability.sustainable_practices.rotational_grazing} || ${data.agricultural_analysis.sustainability.sustainable_practices.renewable_energy_usage} || ${data.agricultural_analysis.sustainability.sustainable_practices.reduced_tillage}`
+  }
+
+  const test = function(){
+
+  }
+
+  
  function updateAgriDashboard(data) {
       farmOverview(data);  
       cropManagement(data);
@@ -180,7 +213,8 @@ async function processAgriSheet(sheetData) {
       resourceManagement(data);
       financialPerformance(data);
       riskManagement(data);
-
+      complianceRegulations(data);
+      sustainability(data);
   }
 
   // NAVIGATION CODE
